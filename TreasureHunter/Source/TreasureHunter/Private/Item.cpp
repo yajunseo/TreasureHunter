@@ -2,6 +2,7 @@
 
 
 #include "Item.h"
+#include  "TreasureHunter/DebugMecros.h"
 
 // Sets default values
 AItem::AItem()
@@ -15,7 +16,12 @@ AItem::AItem()
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	FVector Location = GetActorLocation();
+	FVector ForwardLocation = Location + GetActorForwardVector() * 100.f;
+	// DRAW_SPHERE(Location);
+	// DRAW_LINE(Location, ForwardLocation);
+	// DRAW_POINT(ForwardLocation);
+	DRAW_VECTOR(Location, ForwardLocation);
 }
 
 // Called every frame
@@ -23,5 +29,9 @@ void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+    if(GEngine != nullptr)
+    {
+	    GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Red, FString::Format(TEXT("{0}"), {DeltaTime}));
+    }
 }
 
