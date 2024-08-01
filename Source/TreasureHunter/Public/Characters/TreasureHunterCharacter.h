@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "EnhancedInputSubsystemInterface.h"
 #include "GameFramework/Character.h"
+#include "Items/Item.h"
 #include "TreasureHunterCharacter.generated.h"
 
 UCLASS()
@@ -16,6 +17,8 @@ public:
 	ATreasureHunterCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	FORCEINLINE void SetOverlappingItem(AItem* Item) {OverlappingItem = Item;}
 	
 protected:
 	virtual void BeginPlay() override;
@@ -33,7 +36,7 @@ protected:
 	UInputAction* JumpAction;
 
 	UPROPERTY(EditAnywhere)
-	UInputAction* EKeyAction;
+	UInputAction* EquipAction;
 	
 	UPROPERTY(EditAnywhere)
 	UInputAction* AttackAction;
@@ -43,10 +46,10 @@ protected:
 	
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void EKeyPressed();
+	void Equip();
 	void Attack();
 	void Dodge();
-
+	
 private:
 	UPROPERTY(VisibleAnywhere)
 	class USpringArmComponent* SpringArm;
@@ -56,4 +59,9 @@ private:
 	class UGroomComponent* Hair;
 	UPROPERTY(VisibleAnywhere, Category = Hair)
 	class UGroomComponent* Eyebrows;
+
+	UPROPERTY(VisibleInstanceOnly)
+	class AItem* OverlappingItem;
+
+	const FName RIGHT_HAND_SOCKET = TEXT("RightHandSocket");
 };

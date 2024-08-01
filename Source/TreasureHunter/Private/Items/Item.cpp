@@ -3,6 +3,7 @@
 
 #include "Items/Item.h"
 
+#include "Characters/TreasureHunterCharacter.h"
 #include "Components/SphereComponent.h"
 #include  "TreasureHunter/DebugMecros.h"
 
@@ -41,20 +42,20 @@ float AItem::TransformedCos()
 void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	const FString OtherActorName = OtherActor->GetName();
-	if(GEngine)
+	ATreasureHunterCharacter* TreasureHunterCharacter = Cast<ATreasureHunterCharacter>(OtherActor);
+	if(TreasureHunterCharacter)
 	{
-		GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Blue, OtherActorName);
+		TreasureHunterCharacter->SetOverlappingItem(this);
 	}
 }
 
 void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	const FString OtherActorName = OtherActor->GetName();
-	if(GEngine)
+	ATreasureHunterCharacter* TreasureHunterCharacter = Cast<ATreasureHunterCharacter>(OtherActor);
+	if(TreasureHunterCharacter)
 	{
-		GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Red, OtherActorName);
+		TreasureHunterCharacter->SetOverlappingItem(nullptr);
 	}
 }
 
@@ -64,6 +65,7 @@ void AItem::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	RunningTime += DeltaTime;
 
-	AddActorWorldOffset(FVector(0.0f, 0.0f, TransformedSin()));
+	if(isMoveSin)
+		AddActorWorldOffset(FVector(0.0f, 0.0f, TransformedSin()));
 }
 

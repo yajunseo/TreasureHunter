@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GroomComponent.h"
+#include "Items/Weapons/Weapon.h"
 
 // Sets default values
 ATreasureHunterCharacter::ATreasureHunterCharacter()
@@ -74,8 +75,13 @@ void ATreasureHunterCharacter::Look(const FInputActionValue& Value)
 	AddControllerYawInput(LookAxisValue.X);
 }
 
-void ATreasureHunterCharacter::EKeyPressed()
+void ATreasureHunterCharacter::Equip()
 {
+	AWeapon* Weapon = Cast<AWeapon>(OverlappingItem);
+	if(Weapon != nullptr)
+	{
+		Weapon->Equip(this->GetMesh(), RIGHT_HAND_SOCKET);	
+	}
 }
 
 void ATreasureHunterCharacter::Attack()
@@ -103,7 +109,7 @@ void ATreasureHunterCharacter::SetupPlayerInputComponent(UInputComponent* Player
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Jump);
-		EnhancedInputComponent->BindAction(EKeyAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::EKeyPressed);
+		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Equip);
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Attack);
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Dodge);
 	}
