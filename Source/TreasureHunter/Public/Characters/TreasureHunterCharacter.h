@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystemInterface.h"
 #include "GameFramework/Character.h"
 #include "Items/Item.h"
+#include "CharacterType.h"
 #include "TreasureHunterCharacter.generated.h"
 
 UCLASS()
@@ -17,8 +18,6 @@ public:
 	ATreasureHunterCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	FORCEINLINE void SetOverlappingItem(AItem* Item) {OverlappingItem = Item;}
 	
 protected:
 	virtual void BeginPlay() override;
@@ -51,6 +50,8 @@ protected:
 	void Dodge();
 	
 private:
+	ECharacterState CharacterState = ECharacterState::ECS_UNEQUIPPED;
+	
 	UPROPERTY(VisibleAnywhere)
 	class USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleAnywhere)
@@ -64,4 +65,8 @@ private:
 	class AItem* OverlappingItem;
 
 	const FName RIGHT_HAND_SOCKET = TEXT("RightHandSocket");
+
+public:
+	FORCEINLINE void SetOverlappingItem(AItem* Item) {OverlappingItem = Item;}
+	FORCEINLINE ECharacterState GetCharacterState() const {return CharacterState;}
 };

@@ -27,5 +27,6 @@ void UTreasureHunterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		GroundSpeed	= UKismetMathLibrary::VSizeXY(TreasureHunterMovementComponent->Velocity);
 
 		IsFalling = TreasureHunterMovementComponent->IsFalling();
+		CharacterState = TreasureHunterCharacter->GetCharacterState();
 	}
 }

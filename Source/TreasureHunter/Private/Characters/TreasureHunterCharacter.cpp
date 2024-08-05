@@ -80,7 +80,8 @@ void ATreasureHunterCharacter::Equip()
 	AWeapon* Weapon = Cast<AWeapon>(OverlappingItem);
 	if(Weapon != nullptr)
 	{
-		Weapon->Equip(this->GetMesh(), RIGHT_HAND_SOCKET);	
+		Weapon->Equip(this->GetMesh(), RIGHT_HAND_SOCKET);
+		CharacterState = ECharacterState::ECS_EQUIPPED_ONE_HAND_WEAPON;
 	}
 }
 
