@@ -43,14 +43,24 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UInputAction* DodgeAction;
 	
+	// Callbacks for input
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Equip();
 	void Attack();
 	void Dodge();
+
+	// Montage Function
+	void PlayAttackMontage();
+
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
+	bool CanAttack();
 	
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_UNEQUIPPED;
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EActionState ActionState = EActionState::EAS_Unoccupied;
 	
 	UPROPERTY(VisibleAnywhere)
 	class USpringArmComponent* SpringArm;
@@ -64,9 +74,13 @@ private:
 	UPROPERTY(VisibleInstanceOnly)
 	class AItem* OverlappingItem;
 
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	class UAnimMontage* AttackMontage;
+	
 	const FName RIGHT_HAND_SOCKET = TEXT("RightHandSocket");
 
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) {OverlappingItem = Item;}
 	FORCEINLINE ECharacterState GetCharacterState() const {return CharacterState;}
+	FORCEINLINE EActionState GetActionState() const {return ActionState;}
 };

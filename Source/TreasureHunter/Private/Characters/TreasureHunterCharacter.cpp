@@ -87,10 +87,51 @@ void ATreasureHunterCharacter::Equip()
 
 void ATreasureHunterCharacter::Attack()
 {
+	if(CanAttack())
+	{
+		PlayAttackMontage();
+		ActionState = EActionState::EAS_Attacking;
+	}
 }
 
 void ATreasureHunterCharacter::Dodge()
 {
+}
+
+void ATreasureHunterCharacter::PlayAttackMontage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if(AnimInstance && AttackMontage)
+	{
+		AnimInstance->Montage_Play(AttackMontage);
+		const int32 Selection = FMath::RandRange(0, AttackMontage->CompositeSections.Num() - 1);
+		FName SelectionName = FName();
+		switch (Selection)
+		{
+		case 0:
+			SelectionName = FName("Attack1");
+			break;
+		case 1:
+			SelectionName = FName("Attack2");
+			break;
+		default:
+			break;;
+		}
+
+		AnimInstance->Montage_JumpToSection(SelectionName, AttackMontage);
+	}
+}
+
+void ATreasureHunterCharacter::AttackEnd()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+}
+
+bool ATreasureHunterCharacter::CanAttack()
+{
+	return ActionState == EActionState::EAS_Unoccupied
+		&& CharacterState != ECharacterState::ECS_UNEQUIPPED;
 }
 
 // Called every frame
