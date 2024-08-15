@@ -52,10 +52,20 @@ protected:
 
 	// Montage Function
 	void PlayAttackMontage();
-
+	void PlayEquipMontage(FName SectionName);
+	
 	UFUNCTION(BlueprintCallable)
 	void AttackEnd();
 	bool CanAttack();
+	bool CanDisarm();
+	bool CanArm();
+
+	UFUNCTION(BlueprintCallable)
+	void DisArm();
+	UFUNCTION(BlueprintCallable)
+	void Arm();
+	UFUNCTION(BlueprintCallable)
+	void FinishEquipping();
 	
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_UNEQUIPPED;
@@ -74,11 +84,19 @@ private:
 	UPROPERTY(VisibleInstanceOnly)
 	class AItem* OverlappingItem;
 
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	class AWeapon* EquippedWeapon;
+
+	// Animation Montages
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	class UAnimMontage* AttackMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	class UAnimMontage* EquipMontage;
 	
 	const FName RIGHT_HAND_SOCKET = TEXT("RightHandSocket");
-
+	const FName SPINE_SOCKET = TEXT("SpineSocket");
+	
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) {OverlappingItem = Item;}
 	FORCEINLINE ECharacterState GetCharacterState() const {return CharacterState;}

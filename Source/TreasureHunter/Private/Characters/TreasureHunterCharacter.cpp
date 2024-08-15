@@ -55,7 +55,7 @@ void ATreasureHunterCharacter::BeginPlay()
 
 void ATreasureHunterCharacter::Move(const FInputActionValue& Value)
 {
-	if(ActionState == EActionState::EAS_Attacking)
+	if(ActionState != EActionState::EAS_Unoccupied)
 		return;
 	
 	const FVector2D MovementVector = Value.Get<FVector2D>();
@@ -81,10 +81,28 @@ void ATreasureHunterCharacter::Look(const FInputActionValue& Value)
 void ATreasureHunterCharacter::Equip()
 {
 	AWeapon* Weapon = Cast<AWeapon>(OverlappingItem);
-	if(Weapon != nullptr)
+	if(Weapon)
 	{
 		Weapon->Equip(this->GetMesh(), RIGHT_HAND_SOCKET);
 		CharacterState = ECharacterState::ECS_EQUIPPED_ONE_HAND_WEAPON;
+		OverlappingItem = nullptr;
+		EquippedWeapon = Weapon;
+	}
+	else
+	{
+		if(CanDisarm())
+		{
+			PlayEquipMontage(FName("Unequip"));
+			CharacterState = ECharacterState::ECS_UNEQUIPPED;
+			ActionState = EActionState::EAS_EquippingWeapon;
+		}
+
+		else if(CanArm())
+		{
+			PlayEquipMontage(FName("Equip"));
+			CharacterState = ECharacterState::ECS_EQUIPPED_ONE_HAND_WEAPON;
+			ActionState = EActionState::EAS_EquippingWeapon;
+		}
 	}
 }
 
@@ -126,6 +144,17 @@ void ATreasureHunterCharacter::PlayAttackMontage()
 	}
 }
 
+void ATreasureHunterCharacter::PlayEquipMontage(FName SectionName)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if(AnimInstance && EquipMontage)
+	{
+		AnimInstance->Montage_Play(EquipMontage);
+		AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
+	}
+}
+
 void ATreasureHunterCharacter::AttackEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
@@ -135,6 +164,40 @@ bool ATreasureHunterCharacter::CanAttack()
 {
 	return ActionState == EActionState::EAS_Unoccupied
 		&& CharacterState != ECharacterState::ECS_UNEQUIPPED;
+}
+
+bool ATreasureHunterCharacter::CanDisarm()
+{
+	return ActionState == EActionState::EAS_Unoccupied
+			&& CharacterState != ECharacterState::ECS_UNEQUIPPED;
+}
+
+bool ATreasureHunterCharacter::CanArm()
+{
+	return ActionState == EActionState::EAS_Unoccupied
+		&& CharacterState == ECharacterState::ECS_UNEQUIPPED
+		&& EquippedWeapon;
+}
+
+void ATreasureHunterCharacter::DisArm()
+{
+	if(EquippedWeapon)
+	{
+		EquippedWeapon->AttachMeshToSocket(GetMesh(), SPINE_SOCKET);
+	}
+}
+
+void ATreasureHunterCharacter::Arm()
+{
+	if(EquippedWeapon)
+	{
+		EquippedWeapon->AttachMeshToSocket(GetMesh(), RIGHT_HAND_SOCKET);
+	}
+}
+
+void ATreasureHunterCharacter::FinishEquipping()
+{
+	ActionState = EActionState::EAS_Unoccupied;
 }
 
 // Called every frame
@@ -154,7 +217,7 @@ void ATreasureHunterCharacter::SetupPlayerInputComponent(UInputComponent* Player
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Jump);
-		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Equip);
+		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Started, this, &ATreasureHunterCharacter::Equip);
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Attack);
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Dodge);
 	}
