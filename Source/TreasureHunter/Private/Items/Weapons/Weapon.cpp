@@ -4,8 +4,15 @@
 #include "Items/Weapons/Weapon.h"
 
 #include "Characters/TreasureHunterCharacter.h"
+#include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
+
+AWeapon::AWeapon()
+{
+	WeaponBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Weapon Box"));
+	WeaponBox->SetupAttachment(GetRootComponent());
+}
 
 void AWeapon::AttachMeshToSocket(USceneComponent* InParent, FName InSocketName)
 {

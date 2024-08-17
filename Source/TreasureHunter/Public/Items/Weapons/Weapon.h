@@ -15,6 +15,7 @@ class TREASUREHUNTER_API AWeapon : public AItem
 	GENERATED_BODY()
 
 public:
+	AWeapon();
 	void AttachMeshToSocket(USceneComponent* InParent, FName InSocketName);
 	void Equip(USceneComponent* InParent, FName InSocketName);
 	
@@ -25,4 +26,7 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category = "Weapon Property")
 	class USoundBase* EquipSound;
+
+	UPROPERTY(VisibleAnywhere, Category = "Weapon Property")
+	class UBoxComponent* WeaponBox;
 };
