@@ -6,6 +6,7 @@
 #include "Characters/TreasureHunterCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
+#include "Enemy/Enemy.h"
 #include "Kismet/GameplayStatics.h"
 #include "UObject/FastReferenceCollector.h"
 
@@ -89,4 +90,13 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 		BoxHit,
 		true
 		);
+
+	if(BoxHit.GetActor())
+	{
+		IHitInterface* HitInterface = Cast<IHitInterface>(BoxHit.GetActor());
+		if(HitInterface)
+		{
+			HitInterface->GetHit(BoxHit.ImpactPoint);
+		}
+	}
 }
