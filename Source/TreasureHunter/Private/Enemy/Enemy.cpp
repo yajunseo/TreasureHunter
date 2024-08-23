@@ -4,6 +4,7 @@
 #include "Enemy/Enemy.h"
 
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "TreasureHunter/DebugMecros.h"
 
 AEnemy::AEnemy()
@@ -46,10 +47,8 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-void AEnemy::GetHit(const FVector& ImpactPoint)
+void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 {
-	DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
-
 	const FVector Forward = GetActorForwardVector();
 	const FVector ToHit = (FVector(ImpactPoint.X, ImpactPoint.Y, GetActorLocation().Z) - GetActorLocation()).GetSafeNormal();
 
@@ -64,24 +63,27 @@ void AEnemy::GetHit(const FVector& ImpactPoint)
 	}
 	
 	if(-45.f <= Theta && Theta < 45.f)
-	{
-		GEngine->AddOnScreenDebugMessage(1, 2.f, FColor::Green, TEXT("FromFront"));
 		PlayHitReactMontage(FName("FromFront"));
-	}
 	else if(45.f <= Theta && Theta < 135.f)
-	{
-		GEngine->AddOnScreenDebugMessage(1, 2.f, FColor::Green, TEXT("FromRight"));
 		PlayHitReactMontage(FName("FromRight"));
-	}
 	else if(-135.f <= Theta && Theta < -45.f)
-	{
-		GEngine->AddOnScreenDebugMessage(1, 2.f, FColor::Green, TEXT("FromLeft"));
 		PlayHitReactMontage(FName("FromLeft"));
-	}
 	else
-	{
-		GEngine->AddOnScreenDebugMessage(1, 2.f, FColor::Green, TEXT("FromBack"));
 		PlayHitReactMontage(FName("FromBack"));
+}
+
+void AEnemy::GetHit(const FVector& ImpactPoint)
+{
+	DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
+
+	DirectionalHitReact(ImpactPoint);
+
+	if(HitSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this,
+			HitSound,
+			ImpactPoint
+			);
 	}
 }
 
