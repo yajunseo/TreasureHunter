@@ -72,7 +72,7 @@ void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 		PlayHitReactMontage(FName("FromBack"));
 }
 
-void AEnemy::GetHit(const FVector& ImpactPoint)
+void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
 	//DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
 
