@@ -46,6 +46,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	class USphereComponent* Sphere;
+
+	UPROPERTY(VisibleAnywhere)
+	class UNiagaraComponent* EmberEffect;
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

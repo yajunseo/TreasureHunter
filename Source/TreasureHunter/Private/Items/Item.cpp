@@ -3,6 +3,7 @@
 
 #include "Items/Item.h"
 
+#include "NiagaraComponent.h"
 #include "Characters/TreasureHunterCharacter.h"
 #include "Components/SphereComponent.h"
 #include  "TreasureHunter/DebugMecros.h"
@@ -18,6 +19,9 @@ AItem::AItem()
 	
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	Sphere->SetupAttachment(RootComponent);
+
+	EmberEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Embers"));
+	EmberEffect->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
