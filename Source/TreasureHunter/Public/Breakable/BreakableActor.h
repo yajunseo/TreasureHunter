@@ -33,4 +33,5 @@ private:
 	void AfterBreak(const FChaosBreakEvent& BreakEvent);
 	
 	bool bBroken = false;
+	bool bAfterBrokenMethodCall = false;
 };

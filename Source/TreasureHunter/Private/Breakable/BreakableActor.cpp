@@ -11,24 +11,19 @@ ABreakableActor::ABreakableActor()
 	PrimaryActorTick.bCanEverTick = false;
 	GeometryCollection = CreateDefaultSubobject<UGeometryCollectionComponent>(TEXT("GeometryCollection"));
 	SetRootComponent(GeometryCollection);
-	GeometryCollection->SetGenerateOverlapEvents(true);
-	GeometryCollection->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-	GeometryCollection->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-	
+
 	Capsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
 	Capsule->SetupAttachment(GetRootComponent());
-	Capsule->SetCollisionResponseToAllChannels(ECR_Ignore);
-	Capsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 }
 
 void ABreakableActor::GetHit_Implementation(const FVector& ImpactPoint)
 {
-	if(!bBroken)
+	if(bBroken)
 		return;
 	
 	bBroken = true;
 	UWorld* World = GetWorld();
-	
+
 	if(World && TreasureClasses.Num() > 0)
 	{
 		int32 randomIndex = FMath::RandRange(0, TreasureClasses.Num() - 1);
@@ -42,13 +37,22 @@ void ABreakableActor::GetHit_Implementation(const FVector& ImpactPoint)
 void ABreakableActor::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT("1"));
 	GeometryCollection->OnChaosBreakEvent.AddDynamic(this, &ABreakableActor::AfterBreak);
+
+	GeometryCollection->SetGenerateOverlapEvents(true);
+	GeometryCollection->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GeometryCollection->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	
+	Capsule->SetCollisionResponseToAllChannels(ECR_Ignore);
+	Capsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 }
 
 void ABreakableActor::AfterBreak(const FChaosBreakEvent& BreakEvent)
 {
-	UE_LOG(LogTemp, Warning, TEXT("2"));
+	if(bAfterBrokenMethodCall)
+		return;
+
+	bAfterBrokenMethodCall = true;
 	
 	SetLifeSpan(3.0f);
 	Capsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
