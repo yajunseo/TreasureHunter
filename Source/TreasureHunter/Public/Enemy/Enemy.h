@@ -19,7 +19,8 @@ public:
 	void DirectionalHitReact(const FVector& ImpactPoint);
 
 	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
-
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -27,6 +28,12 @@ protected:
 	void PlayHitReactMontage(const FName& SectionName);
 	
 private:
+	UPROPERTY(VisibleAnywhere)
+	class UAttributeComponent* Attribute;
+
+	UPROPERTY(VisibleAnywhere)
+	class UHealthBarComponent* HealthBarWidget;
+	
 	// Animation Montages
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	class UAnimMontage* HitReactMontage;
@@ -36,6 +43,5 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = VisualEffects)
 	UParticleSystem* HitParticles;
-public:
-	
+
 };

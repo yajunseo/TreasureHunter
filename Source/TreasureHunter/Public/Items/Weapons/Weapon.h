@@ -17,7 +17,7 @@ class TREASUREHUNTER_API AWeapon : public AItem
 public:
 	AWeapon();
 	void AttachMeshToSocket(USceneComponent* InParent, FName InSocketName);
-	void Equip(USceneComponent* InParent, FName InSocketName);
+	void Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator);
 
 	TArray<AActor *> IgnoreActors;
 	
@@ -39,12 +39,15 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Property")
 	class UBoxComponent* WeaponBox;
 
+	UPROPERTY(EditAnywhere, Category = "Weapon Property")
+	float Damage = 20.f;
+	
 	UPROPERTY(VisibleAnywhere)
 	class USceneComponent* BoxTraceStart;
 
 	UPROPERTY(VisibleAnywhere)
 	class USceneComponent* BoxTraceEnd;
-	
+
 public:
 	FORCEINLINE UBoxComponent* GetWeaponBox() const {return WeaponBox;}
 };

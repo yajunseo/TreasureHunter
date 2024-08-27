@@ -3,7 +3,10 @@
 
 #include "Enemy/Enemy.h"
 
+#include "Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
+#include "HUD/HealthBarComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "TreasureHunter/DebugMecros.h"
 
@@ -17,12 +20,18 @@ AEnemy::AEnemy()
 	GetMesh()->SetGenerateOverlapEvents(true);
 	
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	Attribute = CreateDefaultSubobject<UAttributeComponent>(TEXT("Attributes"));
+
+	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
+	HealthBarWidget->SetupAttachment(GetRootComponent());
 }
 
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	HealthBarWidget->SetHealthPercent(Attribute->GetHealthPercent());
 }
 
 void AEnemy::PlayHitReactMontage(const FName& SectionName)
@@ -92,5 +101,17 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 			HitParticles,
 			ImpactPoint);
 	}
+}
+
+float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	if(Attribute && HealthBarWidget)
+	{
+		Attribute->ReceiveDamage(DamageAmount);
+		HealthBarWidget->SetHealthPercent(Attribute->GetHealthPercent());
+	}
+	
+	return DamageAmount;
 }
 
