@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/CharacterType.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/HitInterface.h"
 #include "Enemy.generated.h"
+
 
 UCLASS()
 class TREASUREHUNTER_API AEnemy : public ACharacter, public IHitInterface
@@ -24,8 +26,13 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void Die();
+	
 	// Montage Function
 	void PlayHitReactMontage(const FName& SectionName);
+
+	UPROPERTY(BlueprintReadOnly)
+	EDeathPose DeathPos = EDeathPose::EDP_Alive;
 	
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -38,10 +45,18 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	class UAnimMontage* HitReactMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	class UAnimMontage* DeathMontage;
+	
 	UPROPERTY(EditAnywhere, Category = Sounds)
 	USoundBase* HitSound;
 
 	UPROPERTY(EditAnywhere, Category = VisualEffects)
 	UParticleSystem* HitParticles;
 
+	UPROPERTY()
+	AActor* CombatTarget;
+
+	UPROPERTY(EditAnywhere)
+	double CombatRadius = 500.f;
 };

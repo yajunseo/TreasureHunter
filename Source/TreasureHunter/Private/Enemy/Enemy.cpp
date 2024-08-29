@@ -3,6 +3,8 @@
 
 #include "Enemy/Enemy.h"
 
+#include <string>
+
 #include "Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
@@ -31,7 +33,39 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	HealthBarWidget->SetHealthPercent(Attribute->GetHealthPercent());
+	if(HealthBarWidget)
+	{
+		HealthBarWidget->SetHealthPercent(Attribute->GetHealthPercent());
+		HealthBarWidget->SetVisibility(false);
+	}
+}
+
+void AEnemy::Die()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance && DeathMontage)
+	{
+		const int32 SectionNum = DeathMontage->GetNumSections();
+		if(SectionNum > 0)
+		{
+			const int32 Selection = FMath::RandRange(1,SectionNum);
+			FString SectionString = FString::Printf(TEXT("Death%d"), Selection);
+			FName SectionName = FName(*SectionString);
+
+			DeathPos = static_cast<EDeathPose>(Selection);
+			
+			AnimInstance->Montage_Play(DeathMontage);
+			AnimInstance->Montage_JumpToSection(SectionName, DeathMontage);
+		}
+	}
+
+	if(HealthBarWidget)
+	{
+		HealthBarWidget->SetVisibility(false);
+	}
+	
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetLifeSpan(3.f);
 }
 
 void AEnemy::PlayHitReactMontage(const FName& SectionName)
@@ -48,6 +82,18 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if(CombatTarget)
+	{
+		const double DistanceToTarget = (CombatTarget->GetActorLocation() - GetActorLocation()).Size();
+
+		if(DistanceToTarget > CombatRadius)
+		{
+			CombatTarget = nullptr;
+
+			if(HealthBarWidget)
+				HealthBarWidget->SetVisibility(false);
+		}
+	}
 }
 
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -85,7 +131,16 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
 	//DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
 
-	DirectionalHitReact(ImpactPoint);
+	if(Attribute && Attribute->IsAlive())
+	{
+		DirectionalHitReact(ImpactPoint);
+	}
+	
+	else
+	{
+		Die();
+		return;
+	}
 
 	if(HitSound)
 	{
@@ -108,9 +163,12 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 {
 	if(Attribute && HealthBarWidget)
 	{
+		HealthBarWidget->SetVisibility(true);
 		Attribute->ReceiveDamage(DamageAmount);
 		HealthBarWidget->SetHealthPercent(Attribute->GetHealthPercent());
 	}
+
+	CombatTarget = EventInstigator->GetPawn();
 	
 	return DamageAmount;
 }
