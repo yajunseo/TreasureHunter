@@ -8,6 +8,7 @@
 #include "Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/HealthBarComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "TreasureHunter/DebugMecros.h"
@@ -27,6 +28,11 @@ AEnemy::AEnemy()
 
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
 	HealthBarWidget->SetupAttachment(GetRootComponent());
+	
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
 }
 
 void AEnemy::BeginPlay()
