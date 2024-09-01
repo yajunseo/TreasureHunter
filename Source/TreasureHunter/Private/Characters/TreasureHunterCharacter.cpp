@@ -52,6 +52,8 @@ void ATreasureHunterCharacter::BeginPlay()
 		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			Subsystem->AddMappingContext(TreasureHunterContext, 0);
 	}
+
+	Tags.Add(FName("TreasureHunter"));
 }
 
 void ATreasureHunterCharacter::Move(const FInputActionValue& Value)

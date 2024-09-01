@@ -5,12 +5,18 @@
 
 #include <string>
 
+#include "AIController.h"
+#include "MathUtil.h"
+#include "Navigation/PathFollowingComponent.h"
+#include "NavigationPath.h"
+#include "Characters/TreasureHunterCharacter.h"
 #include "Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/HealthBarComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Perception/PawnSensingComponent.h"
 #include "TreasureHunter/DebugMecros.h"
 
 AEnemy::AEnemy()
@@ -28,11 +34,90 @@ AEnemy::AEnemy()
 
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
 	HealthBarWidget->SetupAttachment(GetRootComponent());
+
+	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
+	PawnSensing->SightRadius = 4000.f;
+	PawnSensing->SetPeripheralVisionAngle(45.f);
+	PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
+
 	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+}
+
+void AEnemy::AIMoveTo(const AActor* TargetActor)
+{
+	if(EnemyController && TargetActor)
+	{
+		FAIMoveRequest MoveRequest;
+		MoveRequest.SetGoalActor(TargetActor);
+		MoveRequest.SetAcceptanceRadius(15.f);
+		FNavPathSharedPtr NavPath;
+		EnemyController->MoveTo(MoveRequest, &NavPath);
+	}
+}
+
+AActor* AEnemy::ChoosePatrolTarget()
+{
+	TArray<AActor*> ValidTargets;
+
+	for(AActor* target : PatrolTargets)
+	{
+		if(target != PatrolTarget)
+		{
+			ValidTargets.AddUnique(target);
+		}
+	}
+			
+	const int32 PatrolTargetsNum = ValidTargets.Num();
+	if(PatrolTargetsNum > 0)
+	{
+		const int32 RandomPatrolIndex = FMath::RandRange(0, PatrolTargetsNum - 1);
+		PatrolTarget = ValidTargets[RandomPatrolIndex];
+
+		return PatrolTarget;
+	}
+
+	return nullptr;
+}
+
+void AEnemy::PawnSeen(APawn* SeenPawn)
+{
+	if(EnemyState == EEnemyState::EES_Chasing)
+		return;
+	
+	if(SeenPawn->ActorHasTag(FName("TreasureHunter")))
+	{
+		if(EnemyState != EEnemyState::EES_Attacking)
+		{
+			SetEnemyState(EEnemyState::EES_Chasing, SeenPawn);	
+		}
+	}
+}
+
+void AEnemy::SetEnemyState(EEnemyState state, AActor* TargetActor)
+{
+	switch (state)
+	{
+	case EEnemyState::EES_Patrolling:
+		EnemyState = EEnemyState::EES_Patrolling;
+		GetCharacterMovement()->MaxWalkSpeed = patrolSpeed;
+		AIMoveTo(TargetActor);
+		break;
+	case EEnemyState::EES_Chasing:
+		EnemyState = EEnemyState::EES_Chasing;
+		GetCharacterMovement()->MaxWalkSpeed = ChasingSpeed;
+		GetWorldTimerManager().ClearTimer(PatrolTimer);
+		AIMoveTo(TargetActor);
+		CombatTarget = TargetActor;
+		break;
+	case EEnemyState::EES_Attacking:
+		EnemyState = EEnemyState::EES_Attacking;
+		break;
+	default: ;
+	}
 }
 
 void AEnemy::BeginPlay()
@@ -44,6 +129,9 @@ void AEnemy::BeginPlay()
 		HealthBarWidget->SetHealthPercent(Attribute->GetHealthPercent());
 		HealthBarWidget->SetVisibility(false);
 	}
+
+	EnemyController = Cast<AAIController>(GetController());
+	AIMoveTo(PatrolTarget);
 }
 
 void AEnemy::Die()
@@ -74,6 +162,15 @@ void AEnemy::Die()
 	SetLifeSpan(3.f);
 }
 
+bool AEnemy::InTargetRange(AActor* Target, double Radius)
+{
+	if(Target == nullptr)
+		return false;
+	
+	const double DistanceToTarget = (Target->GetActorLocation() - GetActorLocation()).Size();
+	return DistanceToTarget <= Radius ? true : false;
+}
+
 void AEnemy::PlayHitReactMontage(const FName& SectionName)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -84,21 +181,56 @@ void AEnemy::PlayHitReactMontage(const FName& SectionName)
 	}
 }
 
+void AEnemy::PatrolTimerFinished()
+{
+	AIMoveTo(PatrolTarget);
+}
+
+void AEnemy::CheckCombatTarget()
+{
+	if(!InTargetRange(CombatTarget, CombatRadius))
+	{
+		CombatTarget = nullptr;
+
+		if(HealthBarWidget)
+			HealthBarWidget->SetVisibility(false);
+
+		SetEnemyState(EEnemyState::EES_Patrolling, PatrolTarget);
+	}
+
+	else if(!InTargetRange(CombatTarget, AttackRadius) && EnemyState != EEnemyState::EES_Chasing)
+	{
+		SetEnemyState(EEnemyState::EES_Chasing, CombatTarget);
+	}
+	
+	else if(InTargetRange(CombatTarget, AttackRadius) && EnemyState != EEnemyState::EES_Attacking)
+	{
+		
+	}
+}
+
+void AEnemy::CheckPatrolTarget()
+{
+	if(InTargetRange(PatrolTarget, PatrolRadius))
+	{
+		PatrolTarget = ChoosePatrolTarget();
+		const float WaitTime = FMath::RandRange(WaitMin, WaitMax);
+		GetWorldTimerManager().SetTimer(PatrolTimer, this, &AEnemy::PatrolTimerFinished, WaitTime);
+	}
+}
+
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if(CombatTarget)
+	
+	if(EnemyState != EEnemyState::EES_Patrolling)
 	{
-		const double DistanceToTarget = (CombatTarget->GetActorLocation() - GetActorLocation()).Size();
+		CheckCombatTarget();		
+	}
 
-		if(DistanceToTarget > CombatRadius)
-		{
-			CombatTarget = nullptr;
-
-			if(HealthBarWidget)
-				HealthBarWidget->SetVisibility(false);
-		}
+	else
+	{
+		CheckPatrolTarget();	
 	}
 }
 
@@ -135,8 +267,6 @@ void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
-	//DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
-
 	if(Attribute && Attribute->IsAlive())
 	{
 		DirectionalHitReact(ImpactPoint);
@@ -175,6 +305,8 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	}
 
 	CombatTarget = EventInstigator->GetPawn();
+
+	SetEnemyState(EEnemyState::EES_Chasing, CombatTarget);
 	
 	return DamageAmount;
 }
