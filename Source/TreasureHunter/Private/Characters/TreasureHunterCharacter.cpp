@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Characters/TreasureHunterCharacter.h"
@@ -9,13 +8,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GroomComponent.h"
-#include "Components/BoxComponent.h"
 #include "Items/Weapons/Weapon.h"
 
-// Sets default values
 ATreasureHunterCharacter::ATreasureHunterCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	bUseControllerRotationPitch = false;
@@ -111,6 +107,8 @@ void ATreasureHunterCharacter::Equip()
 
 void ATreasureHunterCharacter::Attack()
 {
+	Super::Attack();
+	
 	if(CanAttack())
 	{
 		PlayAttackMontage();
@@ -124,6 +122,8 @@ void ATreasureHunterCharacter::Dodge()
 
 void ATreasureHunterCharacter::PlayAttackMontage()
 {
+	Super::PlayAttackMontage();
+	
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
 	if(AnimInstance && AttackMontage)
@@ -226,12 +226,4 @@ void ATreasureHunterCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	}
 }
 
-void ATreasureHunterCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
-{
-	if(EquippedWeapon && EquippedWeapon->GetWeaponBox())
-	{
-		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-		EquippedWeapon->IgnoreActors.Empty();
-	}
-}
 

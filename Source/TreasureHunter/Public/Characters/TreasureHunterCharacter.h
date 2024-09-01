@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BaseCharacter.h"
 #include "EnhancedInputSubsystemInterface.h"
-#include "GameFramework/Character.h"
 #include "Items/Item.h"
 #include "CharacterType.h"
 #include "TreasureHunterCharacter.generated.h"
 
 UCLASS()
-class TREASUREHUNTER_API ATreasureHunterCharacter : public ACharacter
+class TREASUREHUNTER_API ATreasureHunterCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -18,9 +18,6 @@ public:
 	ATreasureHunterCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UFUNCTION(BlueprintCallable)
-	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -50,16 +47,15 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Equip();
-	void Attack();
+	virtual void Attack() override;
 	void Dodge();
 
 	// Montage Function
-	void PlayAttackMontage();
+	virtual void PlayAttackMontage() override;
 	void PlayEquipMontage(FName SectionName);
 	
-	UFUNCTION(BlueprintCallable)
-	void AttackEnd();
-	bool CanAttack();
+	virtual void AttackEnd() override;
+	virtual bool CanAttack() override;
 	bool CanDisarm();
 	bool CanArm();
 
@@ -87,13 +83,7 @@ private:
 	UPROPERTY(VisibleInstanceOnly)
 	class AItem* OverlappingItem;
 
-	UPROPERTY(VisibleAnywhere, Category = Weapon)
-	class AWeapon* EquippedWeapon;
-
 	// Animation Montages
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
-	class UAnimMontage* AttackMontage;
-
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	class UAnimMontage* EquipMontage;
 	
