@@ -9,7 +9,6 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/HealthBarComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "Perception/PawnSensingComponent.h"
 #include "Components/AttributeComponent.h"
 #include "Items/Weapons/Weapon.h"
@@ -82,36 +81,6 @@ void AEnemy::Attack()
 	PlayAttackMontage();
 }
 
-void AEnemy::PlayAttackMontage()
-{
-	Super::PlayAttackMontage();
-
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-	if(AnimInstance && AttackMontage)
-	{
-		AnimInstance->Montage_Play(AttackMontage);
-		const int32 Selection = FMath::RandRange(0, AttackMontage->CompositeSections.Num() - 1);
-		FName SelectionName = FName();
-		switch (Selection)
-		{
-		case 0:
-			SelectionName = FName("Attack1");
-			break;
-		case 1:
-			SelectionName = FName("Attack2");
-			break;
-		case 2:
-			SelectionName = FName("Attack3");
-			break;
-		default:
-			break;;
-		}
-
-		AnimInstance->Montage_JumpToSection(SelectionName, AttackMontage);
-	}
-}
-
 bool AEnemy::CanAttack()
 {
 	bool bCanAttack = IsInSideAttackRadius()
@@ -129,6 +98,18 @@ void AEnemy::HandleDamage(float DamageAmount)
 	{
 		HealthBarWidget->SetHealthPercent(Attribute->GetHealthPercent());
 	}
+}
+
+int32 AEnemy::PlayDeathMontage()
+{
+	const int32 Selection = Super::PlayDeathMontage();
+	TEnumAsByte<EDeathPose> Pose(Selection);
+	if(Pose < EDeathPose::EDP_MAX)
+	{
+		DeathPos = Pose;
+	}
+
+	return Selection;
 }
 
 void AEnemy::PawnSeen(APawn* SeenPawn)
@@ -166,27 +147,14 @@ void AEnemy::BeginPlay()
 
 void AEnemy::Die()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance && DeathMontage)
-	{
-		const int32 SectionNum = DeathMontage->GetNumSections();
-		if(SectionNum > 0)
-		{
-			const int32 Selection = FMath::RandRange(1,SectionNum);
-			FString SectionString = FString::Printf(TEXT("Death%d"), Selection);
-			FName SectionName = FName(*SectionString);
+	EnemyState = EEnemyState::EES_Dead;
 
-			DeathPos = static_cast<EDeathPose>(Selection);
-			
-			AnimInstance->Montage_Play(DeathMontage);
-			AnimInstance->Montage_JumpToSection(SectionName, DeathMontage);
-		}
-	}
-
+	ClearAttackTimer();
+	PlayDeathMontage();
 	HideHealthBar();
-	
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SetLifeSpan(3.f);
+	DisableCapsule();
+	SetLifeSpan(DeathLifeSpan);
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
 bool AEnemy::InTargetRange(AActor* Target, double Radius)

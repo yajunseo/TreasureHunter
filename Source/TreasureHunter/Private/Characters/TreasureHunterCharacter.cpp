@@ -120,33 +120,6 @@ void ATreasureHunterCharacter::Dodge()
 {
 }
 
-void ATreasureHunterCharacter::PlayAttackMontage()
-{
-	Super::PlayAttackMontage();
-	
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-	if(AnimInstance && AttackMontage)
-	{
-		AnimInstance->Montage_Play(AttackMontage);
-		const int32 Selection = FMath::RandRange(0, AttackMontage->CompositeSections.Num() - 1);
-		FName SelectionName = FName();
-		switch (Selection)
-		{
-		case 0:
-			SelectionName = FName("Attack1");
-			break;
-		case 1:
-			SelectionName = FName("Attack2");
-			break;
-		default:
-			break;;
-		}
-
-		AnimInstance->Montage_JumpToSection(SelectionName, AttackMontage);
-	}
-}
-
 void ATreasureHunterCharacter::PlayEquipMontage(FName SectionName)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();

@@ -51,7 +51,6 @@ protected:
 	void Dodge();
 
 	// Montage Function
-	virtual void PlayAttackMontage() override;
 	void PlayEquipMontage(FName SectionName);
 	
 	virtual void AttackEnd() override;

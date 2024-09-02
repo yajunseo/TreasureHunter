@@ -41,9 +41,13 @@ protected:
 	virtual void HandleDamage(float DamageAmount);
 	
 	// Montage Function
-	virtual void PlayAttackMontage();
 	void PlayHitReactMontage(const FName& SectionName);
 	void DirectionalHitReact(const FVector& ImpactPoint);
+	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
+	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
+	virtual int32 PlayAttackMontage();
+	virtual int32 PlayDeathMontage();
+	void DisableCapsule();
 	
 	// Animation Montages
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
@@ -54,6 +58,12 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	class UAnimMontage* DeathMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TArray<FName> AttackMontageSections;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TArray<FName> DeathMontageSections;
 	
 	// Components
 	UPROPERTY(VisibleAnywhere)
