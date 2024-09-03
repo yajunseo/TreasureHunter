@@ -16,7 +16,6 @@ class TREASUREHUNTER_API ATreasureHunterCharacter : public ABaseCharacter
 
 public:
 	ATreasureHunterCharacter();
-	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 protected:

@@ -16,11 +16,6 @@
 AEnemy::AEnemy()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	GetMesh()->SetCollisionObjectType(ECC_WorldDynamic);
-	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-	GetMesh()->SetGenerateOverlapEvents(true);
 	
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
@@ -78,6 +73,7 @@ AActor* AEnemy::ChoosePatrolTarget()
 void AEnemy::Attack()
 {
 	Super::Attack();
+	EnemyState = EEnemyState::EES_Engaged;
 	PlayAttackMontage();
 }
 
@@ -85,6 +81,7 @@ bool AEnemy::CanAttack()
 {
 	bool bCanAttack = IsInSideAttackRadius()
 		&& !IsAttacking()
+		&& !IsEngaged() 
 		&& !IsDead();
 
 	return bCanAttack;
@@ -112,11 +109,19 @@ int32 AEnemy::PlayDeathMontage()
 	return Selection;
 }
 
+void AEnemy::AttackEnd()
+{
+	Super::AttackEnd();
+
+	EnemyState = EEnemyState::EES_NoState;
+	CheckCombatTarget();
+}
+
 void AEnemy::PawnSeen(APawn* SeenPawn)
 {
 	if(EnemyState == EEnemyState::EES_Dead
 		|| EnemyState != EEnemyState::EES_Patrolling
-		|| !SeenPawn->ActorHasTag(FName("TreasureHunter")))
+		|| !SeenPawn->ActorHasTag(FName("EngageableTarget")))
 		return;
 
 	CombatTarget = SeenPawn;
@@ -124,25 +129,31 @@ void AEnemy::PawnSeen(APawn* SeenPawn)
 	ChaseTarget();
 }
 
-void AEnemy::BeginPlay()
+void AEnemy::SpawnDefaultWeapon()
 {
-	Super::BeginPlay();
-
-	if(HealthBarWidget)
-	{
-		HealthBarWidget->SetHealthPercent(Attribute->GetHealthPercent());
-		HideHealthBar();
-	}
-
-	EnemyController = Cast<AAIController>(GetController());
-	AIMoveTo(PatrolTarget);
-
 	UWorld* World = GetWorld();
 	if(World && WeaponClass)
 	{
 		EquippedWeapon = World->SpawnActor<AWeapon>(WeaponClass);
 		EquippedWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
 	}
+}
+
+void AEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+
+	Tags.Add(TEXT("Enemy"));
+	
+	EnemyController = Cast<AAIController>(GetController());
+	AIMoveTo(PatrolTarget);
+	HideHealthBar();
+	SpawnDefaultWeapon();
+
+	GetMesh()->SetCollisionObjectType(ECC_WorldDynamic);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetGenerateOverlapEvents(true);
 }
 
 void AEnemy::Die()
@@ -294,7 +305,7 @@ void AEnemy::CheckPatrolTarget()
 	if(InTargetRange(PatrolTarget, PatrolRadius))
 	{
 		PatrolTarget = ChoosePatrolTarget();
-		const float WaitTime = FMath::RandRange(WaitMin, WaitMax);
+		const float WaitTime = FMath::RandRange(PatrolWaitMin, PatrolWaitMax);
 		GetWorldTimerManager().SetTimer(PatrolTimer, this, &AEnemy::PatrolTimerFinished, WaitTime);
 	}
 }

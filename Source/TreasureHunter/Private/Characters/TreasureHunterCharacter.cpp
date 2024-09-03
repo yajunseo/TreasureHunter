@@ -49,7 +49,13 @@ void ATreasureHunterCharacter::BeginPlay()
 			Subsystem->AddMappingContext(TreasureHunterContext, 0);
 	}
 
-	Tags.Add(FName("TreasureHunter"));
+	Tags.Add(TEXT("EngageableTarget"));
+
+	GetMesh()->SetCollisionObjectType(ECC_WorldDynamic);
+	GetMesh()->SetCollisionResponseToAllChannels(ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+	GetMesh()->SetGenerateOverlapEvents(true);
 }
 
 void ATreasureHunterCharacter::Move(const FInputActionValue& Value)
@@ -176,14 +182,6 @@ void ATreasureHunterCharacter::FinishEquipping()
 	ActionState = EActionState::EAS_Unoccupied;
 }
 
-// Called every frame
-void ATreasureHunterCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-// Called to bind functionality to input
 void ATreasureHunterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
