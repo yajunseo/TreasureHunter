@@ -17,6 +17,10 @@ class TREASUREHUNTER_API ATreasureHunterCharacter : public ABaseCharacter
 public:
 	ATreasureHunterCharacter();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	// <IHitInterface>
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+	// </IHitInterface>
 	
 protected:
 	virtual void BeginPlay() override;
@@ -63,6 +67,8 @@ protected:
 	void Arm();
 	UFUNCTION(BlueprintCallable)
 	void FinishEquipping();
+	UFUNCTION(BlueprintCallable)
+	void HitReactEnd();
 	
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_UNEQUIPPED;

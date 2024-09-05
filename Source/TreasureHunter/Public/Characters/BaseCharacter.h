@@ -25,6 +25,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	class AWeapon* EquippedWeapon;
 
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	virtual void Die();
 	virtual void Attack();
 	virtual bool CanAttack();

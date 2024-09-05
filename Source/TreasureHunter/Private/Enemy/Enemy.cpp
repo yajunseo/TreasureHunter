@@ -166,6 +166,7 @@ void AEnemy::Die()
 	DisableCapsule();
 	SetLifeSpan(DeathLifeSpan);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
+	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 bool AEnemy::InTargetRange(AActor* Target, double Radius)
@@ -328,22 +329,14 @@ void AEnemy::Tick(float DeltaTime)
 	}
 }
 
-void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
+void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
-	ShowHealthBar();
-	
-	PlayHitSound(ImpactPoint);
-	SpawnHitParticles(ImpactPoint);
-	
-	if(IsAlive())
+	Super::GetHit_Implementation(ImpactPoint, Hitter);
+	if(!IsDead())
 	{
-		DirectionalHitReact(ImpactPoint);
+		ShowHealthBar();
 	}
-	
-	else
-	{
-		Die();
-	}
+	ClearPatrolTimer();
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
