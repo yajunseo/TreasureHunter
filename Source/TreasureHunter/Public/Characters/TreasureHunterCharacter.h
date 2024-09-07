@@ -17,7 +17,10 @@ class TREASUREHUNTER_API ATreasureHunterCharacter : public ABaseCharacter
 public:
 	ATreasureHunterCharacter();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	void SetHUDHealth();
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void Jump() override;
+	
 	// <IHitInterface>
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	// </IHitInterface>
@@ -55,6 +58,8 @@ protected:
 
 	// Montage Function
 	void PlayEquipMontage(FName SectionName);
+
+	virtual void Die() override;
 	
 	virtual void AttackEnd() override;
 	virtual bool CanAttack() override;
@@ -71,6 +76,8 @@ protected:
 	void HitReactEnd();
 	
 private:
+	void InitializeTreasureHunterOverlay();
+	
 	ECharacterState CharacterState = ECharacterState::ECS_UNEQUIPPED;
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	EActionState ActionState = EActionState::EAS_Unoccupied;
@@ -93,6 +100,9 @@ private:
 	
 	const FName RIGHT_HAND_SOCKET = TEXT("RightHandSocket");
 	const FName SPINE_SOCKET = TEXT("SpineSocket");
+
+	UPROPERTY()
+	class UTreasureHunterOverlay* TreasureHunterOverlay;
 	
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) {OverlappingItem = Item;}

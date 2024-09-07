@@ -8,6 +8,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GroomComponent.h"
+#include "Components/AttributeComponent.h"
+#include "HUD/TreasureHunterOverlay.h"
+#include "HUD/TreasuretHunterHUD.h"
 #include "Items/Weapons/Weapon.h"
 
 ATreasureHunterCharacter::ATreasureHunterCharacter()
@@ -38,6 +41,28 @@ ATreasureHunterCharacter::ATreasureHunterCharacter()
 	Eyebrows->AttachmentName = FString("head");
 }
 
+void ATreasureHunterCharacter::InitializeTreasureHunterOverlay()
+{
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if(PlayerController)
+	{
+		ATreasuretHunterHUD* TreasuretHunterHUD = Cast<ATreasuretHunterHUD>(PlayerController->GetHUD());
+
+		if(TreasuretHunterHUD)
+		{
+			TreasureHunterOverlay = TreasuretHunterHUD->GetTreasureHunterOverlay();
+
+			if(TreasureHunterOverlay && Attribute)
+			{
+				TreasureHunterOverlay->SetHealthBarPercent(Attribute->GetHealthPercent());
+				TreasureHunterOverlay->SetStaminaBarPercent(1.f);
+				TreasureHunterOverlay->SetGoldText(0);
+				TreasureHunterOverlay->SetSoulText(0);
+			}
+		}
+	}
+}
+
 // Called when the game starts or when spawned
 void ATreasureHunterCharacter::BeginPlay()
 {
@@ -56,6 +81,8 @@ void ATreasureHunterCharacter::BeginPlay()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
 	GetMesh()->SetGenerateOverlapEvents(true);
+
+	InitializeTreasureHunterOverlay();
 }
 
 void ATreasureHunterCharacter::Move(const FInputActionValue& Value)
@@ -137,6 +164,14 @@ void ATreasureHunterCharacter::PlayEquipMontage(FName SectionName)
 	}
 }
 
+void ATreasureHunterCharacter::Die()
+{
+	Super::Die();
+
+	ActionState = EActionState::EAS_Dead;
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 void ATreasureHunterCharacter::AttackEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
@@ -202,12 +237,41 @@ void ATreasureHunterCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	}
 }
 
+void ATreasureHunterCharacter::SetHUDHealth()
+{
+	if(TreasureHunterOverlay && Attribute)
+	{
+		TreasureHunterOverlay->SetHealthBarPercent(Attribute->GetHealthPercent());
+	}
+}
+
+float ATreasureHunterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
+                                           AController* EventInstigator, AActor* DamageCauser)
+{
+	HandleDamage(DamageAmount);
+	SetHUDHealth();
+	
+	return  DamageAmount;
+}
+
+void ATreasureHunterCharacter::Jump()
+{
+	if(ActionState == EActionState::EAS_Unoccupied)
+	{
+		Super::Jump();
+	}
+}
+
 void ATreasureHunterCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
 
-	ActionState = EActionState::EAS_HitReaction;
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	if(Attribute && Attribute->GetHealthPercent() > 0.f)
+	{
+		ActionState = EActionState::EAS_HitReaction;
+	}
 }
 
 

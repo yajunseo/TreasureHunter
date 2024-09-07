@@ -64,15 +64,18 @@ void AWeapon::BeginPlay()
 	WeaponBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 }
 
-bool AWeapon::CheckHitAndAttackActorIsEnemy(AActor* OtherActor)
+bool AWeapon::CheckHitEnable(AActor* OtherActor)
 {
-	return GetOwner()->ActorHasTag(TEXT("Enemy")) && OtherActor->ActorHasTag(TEXT("Enemy"));
+	bool IsEnemyAttackEnemy = GetOwner()->ActorHasTag(TEXT("Enemy")) && OtherActor->ActorHasTag(TEXT("Enemy"));
+	bool isPlayerAttackPlayer = GetOwner()->ActorHasTag(TEXT("EngageableTarget")) && OtherActor->ActorHasTag(TEXT("EngageableTarget"));
+	
+	return !IsEnemyAttackEnemy && !isPlayerAttackPlayer;
 }
 
 void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                            int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(CheckHitAndAttackActorIsEnemy(OtherActor))
+	if(!CheckHitEnable(OtherActor))
 		return;
 	
 	const FVector Start = BoxTraceStart->GetComponentLocation();
@@ -105,7 +108,7 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 	
 	if(BoxHit.GetActor())
 	{
-		if(CheckHitAndAttackActorIsEnemy(BoxHit.GetActor()))
+		if(!CheckHitEnable(BoxHit.GetActor()))
 			return;
 		
 		UGameplayStatics::ApplyDamage(

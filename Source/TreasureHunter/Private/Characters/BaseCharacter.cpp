@@ -5,6 +5,7 @@
 #include "Items/Weapons/Weapon.h"
 #include "Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Characters/CharacterType.h"
 #include "Kismet/GameplayStatics.h"
 
 ABaseCharacter::ABaseCharacter()
@@ -39,10 +40,16 @@ void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 
 void ABaseCharacter::Die()
 {
+	Tags.Add(FName("Dead"));
+	PlayDeathMontage();
 }
 
 void ABaseCharacter::Attack()
 {
+	if(CombatTarget && CombatTarget->ActorHasTag("Dead"))
+	{
+		CombatTarget = nullptr;
+	}
 }
 
 bool ABaseCharacter::CanAttack()
@@ -105,7 +112,14 @@ int32 ABaseCharacter::PlayAttackMontage()
 
 int32 ABaseCharacter::PlayDeathMontage()
 {
-	return PlayRandomMontageSection(DeathMontage, DeathMontageSections);
+	const int32 Selection = PlayRandomMontageSection(DeathMontage, DeathMontageSections);
+	TEnumAsByte<EDeathPose> Pose(Selection);
+	if(Pose < EDeathPose::EDP_MAX)
+	{
+		DeathPose = Pose;
+	}
+	
+	return Selection;
 }
 
 void ABaseCharacter::StopAttackMontage()
