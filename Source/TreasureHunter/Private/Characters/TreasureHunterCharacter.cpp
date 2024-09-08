@@ -274,4 +274,14 @@ void ATreasureHunterCharacter::GetHit_Implementation(const FVector& ImpactPoint,
 	}
 }
 
+void ATreasureHunterCharacter::SetOverlappingItem(AItem* Item)
+{
+	OverlappingItem = Item;
+}
+
+void ATreasureHunterCharacter::AddSouls(ASoul* Soul)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Get Soul"));
+}
+
 

@@ -22,8 +22,8 @@ AItem::AItem()
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	Sphere->SetupAttachment(RootComponent);
 
-	EmberEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Embers"));
-	EmberEffect->SetupAttachment(RootComponent);
+	ItemEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Effect"));
+	ItemEffect->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -50,20 +50,20 @@ float AItem::TransformedCos()
 void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ATreasureHunterCharacter* TreasureHunterCharacter = Cast<ATreasureHunterCharacter>(OtherActor);
-	if(TreasureHunterCharacter)
+	IPickUpInterface* PickUpInterface = Cast<IPickUpInterface>(OtherActor);
+	if(PickUpInterface)
 	{
-		TreasureHunterCharacter->SetOverlappingItem(this);
+		PickUpInterface->SetOverlappingItem(this);
 	}
 }
 
 void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	ATreasureHunterCharacter* TreasureHunterCharacter = Cast<ATreasureHunterCharacter>(OtherActor);
-	if(TreasureHunterCharacter)
+	IPickUpInterface* PickUpInterface = Cast<IPickUpInterface>(OtherActor);
+	if(PickUpInterface)
 	{
-		TreasureHunterCharacter->SetOverlappingItem(nullptr);
+		PickUpInterface->SetOverlappingItem(nullptr);
 	}
 }
 

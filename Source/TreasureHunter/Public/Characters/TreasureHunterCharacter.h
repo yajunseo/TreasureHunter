@@ -7,10 +7,11 @@
 #include "EnhancedInputSubsystemInterface.h"
 #include "Items/Item.h"
 #include "CharacterType.h"
+#include "Interfaces/PickUpInterface.h"
 #include "TreasureHunterCharacter.generated.h"
 
 UCLASS()
-class TREASUREHUNTER_API ATreasureHunterCharacter : public ABaseCharacter
+class TREASUREHUNTER_API ATreasureHunterCharacter : public ABaseCharacter, public IPickUpInterface
 {
 	GENERATED_BODY()
 
@@ -24,6 +25,11 @@ public:
 	// <IHitInterface>
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	// </IHitInterface>
+
+	// <IPickUpInterface>
+	virtual void SetOverlappingItem(AItem* Item) override;
+	virtual void AddSouls(ASoul* Soul) override;
+	// </IPickUpInterface>
 	
 protected:
 	virtual void BeginPlay() override;
@@ -105,7 +111,6 @@ private:
 	class UTreasureHunterOverlay* TreasureHunterOverlay;
 	
 public:
-	FORCEINLINE void SetOverlappingItem(AItem* Item) {OverlappingItem = Item;}
 	FORCEINLINE ECharacterState GetCharacterState() const {return CharacterState;}
 	FORCEINLINE EActionState GetActionState() const {return ActionState;}
 };

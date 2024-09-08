@@ -47,9 +47,9 @@ void AWeapon::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOw
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), EquipSound, GetActorLocation(), GetActorRotation());
 	}
 	
-	if(EmberEffect)
+	if(ItemEffect)
 	{
-		EmberEffect->Deactivate();
+		ItemEffect->Deactivate();
 	}
 }
 
