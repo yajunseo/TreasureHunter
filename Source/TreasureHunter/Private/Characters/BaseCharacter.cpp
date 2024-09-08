@@ -61,6 +61,10 @@ void ABaseCharacter::AttackEnd()
 {
 }
 
+void ABaseCharacter::DodgeEnd()
+{
+}
+
 bool ABaseCharacter::IsAlive()
 {
 	return Attribute && Attribute->IsAlive();
@@ -120,6 +124,11 @@ int32 ABaseCharacter::PlayDeathMontage()
 	}
 	
 	return Selection;
+}
+
+void ABaseCharacter::PlayDodgeMontage()
+{
+	PlayMontageSection(DodgeMontage, FName("Dodge"));
 }
 
 void ABaseCharacter::StopAttackMontage()

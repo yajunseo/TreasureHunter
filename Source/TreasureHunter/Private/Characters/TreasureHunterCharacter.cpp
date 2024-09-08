@@ -153,6 +153,11 @@ void ATreasureHunterCharacter::Attack()
 
 void ATreasureHunterCharacter::Dodge()
 {
+	if(ActionState != EActionState::EAS_Unoccupied)
+		return;
+	
+	PlayDodgeMontage();
+	ActionState = EActionState::EAS_Dodge;
 }
 
 void ATreasureHunterCharacter::PlayEquipMontage(FName SectionName)
@@ -183,6 +188,13 @@ bool ATreasureHunterCharacter::CanAttack()
 {
 	return ActionState == EActionState::EAS_Unoccupied
 		&& CharacterState != ECharacterState::ECS_UNEQUIPPED;
+}
+
+void ATreasureHunterCharacter::DodgeEnd()
+{
+	Super::DodgeEnd();
+
+	ActionState = EActionState::EAS_Unoccupied;
 }
 
 bool ATreasureHunterCharacter::CanDisarm()

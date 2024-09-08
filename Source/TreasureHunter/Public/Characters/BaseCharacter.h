@@ -39,12 +39,16 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
 
+	UFUNCTION(BlueprintCallable)
+	virtual void DodgeEnd();
+	
 	bool IsAlive();
 	
 	// Montage Function
 	void PlayHitReactMontage(const FName& SectionName);
 	virtual int32 PlayAttackMontage();
 	virtual int32 PlayDeathMontage();
+	virtual void PlayDodgeMontage();
 	void StopAttackMontage();
 
 	UFUNCTION(BlueprintCallable)
@@ -83,6 +87,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	class UAnimMontage* HitReactMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = Combat)
+	class UAnimMontage* DodgeMontage;
 	
 	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	class UAnimMontage* DeathMontage;
