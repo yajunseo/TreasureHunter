@@ -29,6 +29,7 @@ public:
 	// <IPickUpInterface>
 	virtual void SetOverlappingItem(AItem* Item) override;
 	virtual void AddSouls(ASoul* Soul) override;
+	virtual void AddGold(ATreasure* Treasure) override;
 	// </IPickUpInterface>
 	
 protected:

@@ -9,11 +9,13 @@ void ASoul::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
                             UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	IPickUpInterface* PickUpInterface = Cast<IPickUpInterface>(OtherActor);
-
 	if(PickUpInterface)
 	{
 		PickUpInterface->AddSouls(this);
+		
+		SpawnPickUpSystem();
+		SpawnPickUpSound();
 	}
-
+	
 	Destroy();
 }

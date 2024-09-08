@@ -11,6 +11,8 @@
 #include "Components/AttributeComponent.h"
 #include "HUD/TreasureHunterOverlay.h"
 #include "HUD/TreasuretHunterHUD.h"
+#include "Items/Soul.h"
+#include "Items/Treasure.h"
 #include "Items/Weapons/Weapon.h"
 
 ATreasureHunterCharacter::ATreasureHunterCharacter()
@@ -281,7 +283,20 @@ void ATreasureHunterCharacter::SetOverlappingItem(AItem* Item)
 
 void ATreasureHunterCharacter::AddSouls(ASoul* Soul)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Get Soul"));
+	if(Attribute && TreasureHunterOverlay)
+	{
+		Attribute->AddSouls(Soul->GetSouls());
+		TreasureHunterOverlay->SetSoulText(Attribute->GetSouls());
+	}
+}
+
+void ATreasureHunterCharacter::AddGold(ATreasure* Treasure)
+{
+	if(Attribute && TreasureHunterOverlay)
+	{
+		Attribute->AddGold(Treasure->GetGold());
+		TreasureHunterOverlay->SetGoldText(Attribute->GetGold());
+	}
 }
 
 

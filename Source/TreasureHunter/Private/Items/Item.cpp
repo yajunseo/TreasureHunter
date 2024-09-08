@@ -6,7 +6,8 @@
 #include "NiagaraComponent.h"
 #include "Characters/TreasureHunterCharacter.h"
 #include "Components/SphereComponent.h"
-#include  "TreasureHunter/DebugMecros.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AItem::AItem()
@@ -64,6 +65,26 @@ void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 	if(PickUpInterface)
 	{
 		PickUpInterface->SetOverlappingItem(nullptr);
+	}
+}
+
+void AItem::SpawnPickUpSystem()
+{
+	if(PickUpEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			this,
+			PickUpEffect,
+			GetActorLocation()
+		);
+	}
+}
+
+void AItem::SpawnPickUpSound()
+{
+	if(PickUpSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, PickUpSound, GetActorLocation());
 	}
 }
 

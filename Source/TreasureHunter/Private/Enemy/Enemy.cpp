@@ -11,6 +11,7 @@
 #include "HUD/HealthBarComponent.h"
 #include "Perception/PawnSensingComponent.h"
 #include "Components/AttributeComponent.h"
+#include "Items/Soul.h"
 #include "Items/Weapons/Weapon.h"
 
 AEnemy::AEnemy()
@@ -150,6 +151,22 @@ void AEnemy::BeginPlay()
 	GetMesh()->SetGenerateOverlapEvents(true);
 }
 
+void AEnemy::SpawnSoul()
+{
+	UWorld* World = GetWorld();
+	UE_LOG(LogTemp, Warning, TEXT("1"));
+	if(World && Attribute && SoulClass)
+	{
+		ASoul* SpawnSoul = World->SpawnActor<ASoul>(SoulClass, GetActorLocation(), GetActorRotation());
+		UE_LOG(LogTemp, Warning, TEXT("2"));
+		if(SpawnSoul)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("3"));
+			SpawnSoul->SetSouls(Attribute->GetSouls());
+		}
+	}
+}
+
 void AEnemy::Die()
 {
 	Super::Die();
@@ -163,6 +180,7 @@ void AEnemy::Die()
 	SetLifeSpan(DeathLifeSpan);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
+	SpawnSoul();
 }
 
 bool AEnemy::InTargetRange(AActor* Target, double Radius)
