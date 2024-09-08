@@ -43,6 +43,17 @@ ATreasureHunterCharacter::ATreasureHunterCharacter()
 	Eyebrows->AttachmentName = FString("head");
 }
 
+void ATreasureHunterCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if(IsAlive() && Attribute && TreasureHunterOverlay)
+	{
+		Attribute->RegenStamina(DeltaSeconds);
+		TreasureHunterOverlay->SetStaminaBarPercent(Attribute->GetStaminaPercent());
+	}
+}
+
 void ATreasureHunterCharacter::InitializeTreasureHunterOverlay()
 {
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
@@ -155,9 +166,19 @@ void ATreasureHunterCharacter::Dodge()
 {
 	if(ActionState != EActionState::EAS_Unoccupied)
 		return;
+
+	if(TreasureHunterOverlay == nullptr)
+		return;
+
+	int32 DodgeStaminaCost = Attribute->GetDodgeCost();
+	
+	if(!HasEnoughStamina(DodgeStaminaCost))
+		return;
 	
 	PlayDodgeMontage();
 	ActionState = EActionState::EAS_Dodge;
+	Attribute->UseStamina(DodgeStaminaCost);
+	TreasureHunterOverlay->SetStaminaBarPercent(Attribute->GetStaminaPercent());
 }
 
 void ATreasureHunterCharacter::PlayEquipMontage(FName SectionName)

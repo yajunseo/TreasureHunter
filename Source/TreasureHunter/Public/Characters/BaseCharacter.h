@@ -30,6 +30,7 @@ protected:
 	virtual void Die();
 	virtual void Attack();
 	virtual bool CanAttack();
+	virtual bool HasEnoughStamina(int32 StaminaCost);
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	virtual void HandleDamage(float DamageAmount);
 	void PlayHitSound(const FVector& ImpactPoint);

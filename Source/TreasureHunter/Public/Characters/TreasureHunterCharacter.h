@@ -17,6 +17,7 @@ class TREASUREHUNTER_API ATreasureHunterCharacter : public ABaseCharacter, publi
 
 public:
 	ATreasureHunterCharacter();
+	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void SetHUDHealth();
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
@@ -70,6 +71,8 @@ protected:
 	
 	virtual void AttackEnd() override;
 	virtual bool CanAttack() override;
+	virtual void DodgeEnd() override;
+	
 	bool CanDisarm();
 	bool CanArm();
 

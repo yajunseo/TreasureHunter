@@ -57,6 +57,13 @@ bool ABaseCharacter::CanAttack()
 	return false;
 }
 
+bool ABaseCharacter::HasEnoughStamina(int32 StaminaCost)
+{
+	return IsAlive() &&
+		Attribute &&
+		Attribute->GetStamina() >= StaminaCost;
+}
+
 void ABaseCharacter::AttackEnd()
 {
 }
