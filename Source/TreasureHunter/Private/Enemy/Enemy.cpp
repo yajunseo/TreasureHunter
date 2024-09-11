@@ -154,14 +154,12 @@ void AEnemy::BeginPlay()
 void AEnemy::SpawnSoul()
 {
 	UWorld* World = GetWorld();
-	UE_LOG(LogTemp, Warning, TEXT("1"));
 	if(World && Attribute && SoulClass)
 	{
 		ASoul* SpawnSoul = World->SpawnActor<ASoul>(SoulClass, GetActorLocation(), GetActorRotation());
-		UE_LOG(LogTemp, Warning, TEXT("2"));
+
 		if(SpawnSoul)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("3"));
 			SpawnSoul->SetSouls(Attribute->GetSouls());
 		}
 	}
