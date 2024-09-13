@@ -128,6 +128,10 @@ void ATreasureHunterCharacter::Equip()
 	AWeapon* Weapon = Cast<AWeapon>(OverlappingItem);
 	if(Weapon)
 	{
+		if(EquippedWeapon)
+		{
+			EquippedWeapon->Destroy();
+		}
 		Weapon->Equip(this->GetMesh(), RIGHT_HAND_SOCKET, this, this);
 		CharacterState = ECharacterState::ECS_EQUIPPED_ONE_HAND_WEAPON;
 		OverlappingItem = nullptr;
@@ -189,12 +193,13 @@ void ATreasureHunterCharacter::PlayEquipMontage(FName SectionName)
 	{
 		AnimInstance->Montage_Play(EquipMontage);
 		AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
+		AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
 	}
 }
 
-void ATreasureHunterCharacter::Die()
+void ATreasureHunterCharacter::Die_Implementation()
 {
-	Super::Die();
+	Super::Die_Implementation();
 
 	ActionState = EActionState::EAS_Dead;
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

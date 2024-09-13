@@ -26,8 +26,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	class AWeapon* EquippedWeapon;
 
+	UFUNCTION(BlueprintNativeEvent)
+	void Die();
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
-	virtual void Die();
 	virtual void Attack();
 	virtual bool CanAttack();
 	virtual bool HasEnoughStamina(int32 StaminaCost);

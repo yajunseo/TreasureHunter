@@ -67,7 +67,7 @@ protected:
 	// Montage Function
 	void PlayEquipMontage(FName SectionName);
 
-	virtual void Die() override;
+	virtual void Die_Implementation() override;
 	
 	virtual void AttackEnd() override;
 	virtual bool CanAttack() override;
