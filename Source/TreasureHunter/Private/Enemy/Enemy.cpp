@@ -41,7 +41,7 @@ void AEnemy::AIMoveTo(const AActor* TargetActor)
 	{
 		FAIMoveRequest MoveRequest;
 		MoveRequest.SetGoalActor(TargetActor);
-		MoveRequest.SetAcceptanceRadius(50.f);
+		MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
 		FNavPathSharedPtr NavPath;
 		EnemyController->MoveTo(MoveRequest, &NavPath);
 	}
@@ -130,7 +130,7 @@ void AEnemy::SpawnDefaultWeapon()
 	if(World && WeaponClass)
 	{
 		EquippedWeapon = World->SpawnActor<AWeapon>(WeaponClass);
-		EquippedWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
+		EquippedWeapon->Equip(GetMesh(), FName("WeaponSocket"), this, this);
 	}
 }
 
@@ -351,6 +351,14 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 	ClearPatrolTimer();
 	ClearAttackTimer();
 	StopAttackMontage();
+	
+	if(IsInSideAttackRadius())
+	{
+		if(!IsDead())
+		{
+			StartAttackTimer();
+		}
+	}
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
