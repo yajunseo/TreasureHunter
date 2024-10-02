@@ -39,6 +39,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Weapon Property")
 	float Damage = 20.f;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Property")
+	FVector CollisionTraceBoxSize = FVector(5.f, 5.f, 5.f);
 	
 	UPROPERTY(VisibleAnywhere)
 	class USceneComponent* BoxTraceStart;

@@ -100,7 +100,7 @@ private:
 	class UGroomComponent* Hair;
 	UPROPERTY(VisibleAnywhere, Category = Hair)
 	class UGroomComponent* Eyebrows;
-
+	
 	UPROPERTY(VisibleInstanceOnly)
 	class AItem* OverlappingItem;
 

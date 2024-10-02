@@ -9,6 +9,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GroomComponent.h"
 #include "Components/AttributeComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "HUD/TreasureHunterOverlay.h"
 #include "HUD/TreasuretHunterHUD.h"
 #include "Items/Soul.h"

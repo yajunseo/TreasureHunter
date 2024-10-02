@@ -86,9 +86,12 @@ void AEnemy::Attack()
 
 	// 현재 공격별 활성화 되는 무기 index 추가
 	CurrentEquippedWeaponIndex.Empty();
-	for(const int32& WeaponIndex : WeaponIndexByAttackSection[AttackSection].WeaponIndexArray)
+	if(WeaponIndexByAttackSection.Num() > AttackSection)
 	{
-		CurrentEquippedWeaponIndex.Add(WeaponIndex);	
+		for(const int32& WeaponIndex : WeaponIndexByAttackSection[AttackSection].WeaponIndexArray)
+		{
+			CurrentEquippedWeaponIndex.Add(WeaponIndex);	
+		}
 	}
 }
 
