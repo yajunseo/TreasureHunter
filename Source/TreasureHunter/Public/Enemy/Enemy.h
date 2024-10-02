@@ -5,7 +5,32 @@
 #include "CoreMinimal.h"
 #include "Characters/BaseCharacter.h"
 #include "Characters/CharacterType.h"
+#include "Templates/Tuple.h"
+#include "Items/Weapons/Weapon.h"
 #include "Enemy.generated.h"
+
+USTRUCT(BlueprintType)
+struct FWeaponData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class AWeapon> WeaponClass; // 무기 클래스
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName SocketName; 
+};
+
+// 공격 섹션 별 무기 인덱스를 저장할 구조체 정의
+USTRUCT(BlueprintType)
+struct FWeaponIndexByAttackSection
+{
+	GENERATED_BODY()
+
+	// 무기 인덱스를 저장할 배열
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<int32> WeaponIndexArray;
+};
 
 
 UCLASS()
@@ -39,6 +64,8 @@ protected:
 	virtual void AttackEnd() override;
 	// </ABaseCharacter>
 
+	virtual void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled) override;
+	
 	void SpawnSoul();
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
@@ -79,9 +106,23 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UPawnSensingComponent* PawnSensing;
 
+	// 무기, 장착 소켓 이름
 	UPROPERTY(EditAnywhere, Category = "Combat");
-	TSubclassOf<class AWeapon> WeaponClass;
+	TArray<FWeaponData> WeaponDatas;
 
+	// 스폰된 무기 저장
+	UPROPERTY(EditAnywhere, Category = "Combat");
+	TArray<class AWeapon*> SpawnWeapon;
+	
+	// 공격 섹션 별 무기 인덱스
+	UPROPERTY(EditAnywhere, Category = "Combat");
+	TArray<FWeaponIndexByAttackSection> WeaponIndexByAttackSection;
+
+	// 현재 장착 중인 무기 인덱스
+	// 공격 별 무기 인덱스
+	UPROPERTY(EditAnywhere, Category = "Combat");
+	TArray<int32> CurrentEquippedWeaponIndex;
+	
 	UPROPERTY(EditAnywhere, Category = "Combat");
 	double CombatRadius = 500.f;
 

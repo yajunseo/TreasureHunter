@@ -21,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
-	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
+	virtual void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
 	
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	class AWeapon* EquippedWeapon;

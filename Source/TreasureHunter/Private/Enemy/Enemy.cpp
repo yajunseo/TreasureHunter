@@ -11,6 +11,7 @@
 #include "HUD/HealthBarComponent.h"
 #include "Perception/PawnSensingComponent.h"
 #include "Components/AttributeComponent.h"
+#include "Components/BoxComponent.h"
 #include "Items/Soul.h"
 #include "Items/Weapons/Weapon.h"
 
@@ -81,7 +82,14 @@ void AEnemy::Attack()
 	}
 	
 	EnemyState = EEnemyState::EES_Engaged;
-	PlayAttackMontage();
+	int AttackSection = PlayAttackMontage();
+
+	// 현재 공격별 활성화 되는 무기 index 추가
+	CurrentEquippedWeaponIndex.Empty();
+	for(const int32& WeaponIndex : WeaponIndexByAttackSection[AttackSection].WeaponIndexArray)
+	{
+		CurrentEquippedWeaponIndex.Add(WeaponIndex);	
+	}
 }
 
 bool AEnemy::CanAttack()
@@ -112,6 +120,21 @@ void AEnemy::AttackEnd()
 	CheckCombatTarget();
 }
 
+void AEnemy::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
+{
+	for(int32 index : CurrentEquippedWeaponIndex)
+	{
+		if(index >= SpawnWeapon.Num())
+			continue;
+		
+		if(SpawnWeapon[index] && SpawnWeapon[index]->GetWeaponBox())
+		{
+			SpawnWeapon[index]->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
+			SpawnWeapon[index]->IgnoreActors.Empty();
+		}
+	}
+}
+
 void AEnemy::PawnSeen(APawn* SeenPawn)
 {
 	if(EnemyState == EEnemyState::EES_Dead
@@ -127,10 +150,15 @@ void AEnemy::PawnSeen(APawn* SeenPawn)
 void AEnemy::SpawnDefaultWeapon()
 {
 	UWorld* World = GetWorld();
-	if(World && WeaponClass)
+	if(World)
 	{
-		EquippedWeapon = World->SpawnActor<AWeapon>(WeaponClass);
-		EquippedWeapon->Equip(GetMesh(), FName("WeaponSocket"), this, this);
+		for(const auto& WeaponData : WeaponDatas)
+		{
+			AWeapon* Weapon = World->SpawnActor<AWeapon>(WeaponData.WeaponClass);
+			Weapon->Equip(GetMesh(), WeaponData.SocketName, this, this);
+	
+			SpawnWeapon.Add(Weapon);
+		}
 	}
 }
 
