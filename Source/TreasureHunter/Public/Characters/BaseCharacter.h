@@ -104,4 +104,5 @@ private:
 
 public:
 	FORCEINLINE EDeathPose GetDeathPose() const { return DeathPose;}
+	FORCEINLINE UAttributeComponent* GetAttribute() const {return Attribute;}
 };

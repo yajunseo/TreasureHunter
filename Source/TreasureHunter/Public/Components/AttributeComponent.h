@@ -53,8 +53,16 @@ public:
 	void AddGold(int32 AddGold);
 	void AddSouls(int32 AddSouls);
 	void RegenStamina(float DeltaTime);
+
+	void SetHealth(float NewHealth) { Health = NewHealth; }
+	void SetMaxHealth(float NewMaxHealth) { MaxHealth = NewMaxHealth; }
+	void SetStamina(float NewStamina) { Stamina = NewStamina; }
+	void SetMaxStamina(float NewMaxStamina) { MaxStamina = NewMaxStamina; }
+	
 	FORCEINLINE int32 GetGold() const { return Gold;}
 	FORCEINLINE int32 GetSouls() const { return Souls;}
+	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
+	FORCEINLINE float GetMaxStamina() const { return MaxStamina; }
 	FORCEINLINE int32 GetStamina() const { return Stamina;}
 	FORCEINLINE int32 GetDodgeCost() const { return DodgeCost;}
 };

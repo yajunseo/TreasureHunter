@@ -3,8 +3,10 @@
 
 #include "Trigger/TriggerBoxMove.h"
 
+#include "Characters/TreasureHunterCharacter.h"
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Instance/SaveInstance.h"
 
 void ATriggerBoxMove::BeginPlay()
 {
@@ -14,6 +16,12 @@ void ATriggerBoxMove::BeginPlay()
 void ATriggerBoxMove::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 {
 	Super::OnOverlapBegin(OverlappedActor, OtherActor);
+
+	// 임시
+	USaveInstance* SaveInstance = Cast<USaveInstance>(GetGameInstance());
+	ATreasureHunterCharacter* Player = Cast<ATreasureHunterCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+
+	SaveInstance->SavePlayerAttributes(Player->GetAttribute());
 	
 	ChangeLevel(this, MoveLevelName);
 }
