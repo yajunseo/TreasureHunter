@@ -69,9 +69,9 @@ void ATreasureHunterCharacter::InitializeTreasureHunterOverlay()
 			if(TreasureHunterOverlay && Attribute)
 			{
 				TreasureHunterOverlay->SetHealthBarPercent(Attribute->GetHealthPercent());
-				TreasureHunterOverlay->SetStaminaBarPercent(1.f);
-				TreasureHunterOverlay->SetGoldText(0);
-				TreasureHunterOverlay->SetSoulText(0);
+				TreasureHunterOverlay->SetStaminaBarPercent(Attribute->GetStaminaPercent());
+				TreasureHunterOverlay->SetGoldText(Attribute->GetGold());
+				TreasureHunterOverlay->SetSoulText(Attribute->GetSouls());
 			}
 		}
 	}
