@@ -10,6 +10,17 @@
 #include "Interfaces/PickUpInterface.h"
 #include "TreasureHunterCharacter.generated.h"
 
+USTRUCT(BlueprintType)
+struct FEquippedItem
+{
+	GENERATED_BODY()
+
+	FEquippedItem(){};
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString WeaponName;
+};
+
 UCLASS()
 class TREASUREHUNTER_API ATreasureHunterCharacter : public ABaseCharacter, public IPickUpInterface
 {
@@ -64,6 +75,9 @@ protected:
 	virtual void Attack() override;
 	void Dodge();
 
+	// Item
+	void SpawnWeapon(AWeapon* Weapon);
+	
 	// Montage Function
 	void PlayEquipMontage(FName SectionName);
 
@@ -91,6 +105,9 @@ private:
 	ECharacterState CharacterState = ECharacterState::ECS_UNEQUIPPED;
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	EActionState ActionState = EActionState::EAS_Unoccupied;
+
+	UPROPERTY()
+	FEquippedItem PlayerEquippedItem;
 	
 	UPROPERTY(VisibleAnywhere)
 	class USpringArmComponent* SpringArm;
@@ -115,6 +132,9 @@ private:
 	class UTreasureHunterOverlay* TreasureHunterOverlay;
 	
 public:
+	void SetPlayerEquippedItem(FEquippedItem& EquippedItem);
+	FEquippedItem& GetPlayerEquippedItem();
+	
 	FORCEINLINE ECharacterState GetCharacterState() const {return CharacterState;}
 	FORCEINLINE EActionState GetActionState() const {return ActionState;}
 };

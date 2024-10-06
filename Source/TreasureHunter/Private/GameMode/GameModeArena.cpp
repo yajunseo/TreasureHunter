@@ -16,6 +16,6 @@ void AGameModeArena::BeginPlay()
 
 	if(SaveInstance && Player)
 	{
-		SaveInstance->LoadPlayerAttributes(Player->GetAttribute());
+		SaveInstance->LoadData(Player);
 	}
 }

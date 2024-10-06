@@ -21,7 +21,7 @@ void ATriggerBoxMove::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor
 	USaveInstance* SaveInstance = Cast<USaveInstance>(GetGameInstance());
 	ATreasureHunterCharacter* Player = Cast<ATreasureHunterCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 
-	SaveInstance->SavePlayerAttributes(Player->GetAttribute());
+	SaveInstance->SaveData(Player);
 	
 	ChangeLevel(this, MoveLevelName);
 }

@@ -16,13 +16,19 @@ class TREASUREHUNTER_API USaveInstance : public UGameInstance
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Save")
-	void SavePlayerAttributes(class UAttributeComponent* AttributeComponent);
+	void SaveData(class ATreasureHunterCharacter* Player);
 	
 	UFUNCTION(BlueprintCallable, Category = "Save")
+	void LoadData(class ATreasureHunterCharacter* Player);
+	
+	void SavePlayerAttributes(class UAttributeComponent* AttributeComponent);
 	void LoadPlayerAttributes(class UAttributeComponent* AttributeComponent);
+	void SavePlayerEquippedItem(struct FEquippedItem& EquippedItem);
+	void LoadPlayerEquippedItem(class ATreasureHunterCharacter* Player);
 
 private:
-	const FString SaveSlotName = TEXT("PlayerSaveSlot");
+	const FString SaveSlotNameAttribute = TEXT("PlayerAttribute");
+	const FString SaveSlotNameEquippedItem = TEXT("PlayerEquippedItem");
 	
 	UPROPERTY(EditAnywhere, Category = "Save")
 	int32 UserIndex = 0;

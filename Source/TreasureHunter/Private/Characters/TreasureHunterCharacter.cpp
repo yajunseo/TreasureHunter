@@ -77,6 +77,66 @@ void ATreasureHunterCharacter::InitializeTreasureHunterOverlay()
 	}
 }
 
+void ATreasureHunterCharacter::SetPlayerEquippedItem(FEquippedItem& EquippedItem)
+{
+	PlayerEquippedItem = EquippedItem;
+
+	FString WeaponName = PlayerEquippedItem.WeaponName;
+	
+	if(!WeaponName.IsEmpty())
+	{
+		// FString WeaponClassPath = FString::Printf(TEXT("%s.%s_C"), *WeaponPath, *WeaponName);
+		// UClass* LoadedClass = StaticLoadClass(AWeapon::StaticClass(), nullptr, *WeaponClassPath);
+		//
+		// if (LoadedClass && LoadedClass->IsChildOf(AWeapon::StaticClass()))
+		// {
+		// 	AWeapon* LoadWeapon = Cast<AWeapon>(LoadedClass);
+		// 	SpawnWeapon(LoadWeapon);
+		// 	UE_LOG(LogTemp, Log, TEXT("Successfully loaded and spawned weapon class: %s"), *WeaponName);
+		// }
+		// else
+		// {
+		// 	UE_LOG(LogTemp, Warning, TEXT("Could not load weapon class for %s. Check class path: %s"), *WeaponName, *WeaponClassPath);
+		// }
+
+		if (WeaponName.EndsWith(TEXT("_C")))
+		{
+			WeaponName = WeaponName.LeftChop(2); // 마지막 2글자('_C')를 제거
+		}
+		
+		FString ClassPath = FString::Printf(TEXT("/Game/Blueprints/Items/Weapons/%s.%s_C"), *WeaponName, *WeaponName);
+		UClass* LoadedClass = StaticLoadClass(UObject::StaticClass(), nullptr, *ClassPath);
+		UWorld* World = GetWorld();
+		
+		if (LoadedClass && LoadedClass->IsChildOf(AWeapon::StaticClass()) && World)
+		{
+			FActorSpawnParameters SpawnParams;
+			AWeapon* SpawnEquipWeapon = World->SpawnActor<AWeapon>(LoadedClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+			SpawnWeapon(SpawnEquipWeapon);
+
+			UE_LOG(LogTemp, Warning, TEXT("%s spawn success"), *WeaponName);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Could not find weapon class for %s"), *WeaponName);
+		}
+	}
+}
+
+FEquippedItem& ATreasureHunterCharacter::GetPlayerEquippedItem()
+{
+	FString WeaponClassName = EquippedWeapon->GetName();
+	int32 Index;
+	if (WeaponClassName.FindLastChar('_', Index))
+	{
+		WeaponClassName = WeaponClassName.Left(Index);
+	}
+	
+	PlayerEquippedItem.WeaponName = WeaponClassName;
+	
+	return PlayerEquippedItem;
+}
+
 // Called when the game starts or when spawned
 void ATreasureHunterCharacter::BeginPlay()
 {
@@ -129,14 +189,7 @@ void ATreasureHunterCharacter::Equip()
 	AWeapon* Weapon = Cast<AWeapon>(OverlappingItem);
 	if(Weapon)
 	{
-		if(EquippedWeapon)
-		{
-			EquippedWeapon->Destroy();
-		}
-		Weapon->Equip(this->GetMesh(), RIGHT_HAND_SOCKET, this, this);
-		CharacterState = ECharacterState::ECS_EQUIPPED_ONE_HAND_WEAPON;
-		OverlappingItem = nullptr;
-		EquippedWeapon = Weapon;
+		SpawnWeapon(Weapon);
 	}
 	else
 	{
@@ -184,6 +237,22 @@ void ATreasureHunterCharacter::Dodge()
 	ActionState = EActionState::EAS_Dodge;
 	Attribute->UseStamina(DodgeStaminaCost);
 	TreasureHunterOverlay->SetStaminaBarPercent(Attribute->GetStaminaPercent());
+}
+
+void ATreasureHunterCharacter::SpawnWeapon(AWeapon* Weapon)
+{
+	if(Weapon == nullptr)
+		return;
+	
+	if(EquippedWeapon)
+	{
+		EquippedWeapon->Destroy();
+	}
+	
+	Weapon->Equip(this->GetMesh(), RIGHT_HAND_SOCKET, this, this);
+	CharacterState = ECharacterState::ECS_EQUIPPED_ONE_HAND_WEAPON;
+	OverlappingItem = nullptr;
+	EquippedWeapon = Weapon;
 }
 
 void ATreasureHunterCharacter::PlayEquipMontage(FName SectionName)
