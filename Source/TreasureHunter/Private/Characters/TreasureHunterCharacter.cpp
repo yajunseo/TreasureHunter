@@ -125,14 +125,19 @@ void ATreasureHunterCharacter::SetPlayerEquippedItem(FEquippedItem& EquippedItem
 
 FEquippedItem& ATreasureHunterCharacter::GetPlayerEquippedItem()
 {
-	FString WeaponClassName = EquippedWeapon->GetName();
-	int32 Index;
-	if (WeaponClassName.FindLastChar('_', Index))
-	{
-		WeaponClassName = WeaponClassName.Left(Index);
-	}
+	PlayerEquippedItem.WeaponName = nullptr;
 	
-	PlayerEquippedItem.WeaponName = WeaponClassName;
+	if(EquippedWeapon != nullptr)
+	{
+		FString WeaponClassName = EquippedWeapon->GetName();
+		int32 Index;
+		if (WeaponClassName.FindLastChar('_', Index))
+		{
+			WeaponClassName = WeaponClassName.Left(Index);
+		}
+
+		PlayerEquippedItem.WeaponName = WeaponClassName;
+	}
 	
 	return PlayerEquippedItem;
 }

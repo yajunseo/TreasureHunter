@@ -20,7 +20,6 @@ public:
 	void Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator);
 
 	TArray<AActor *> IgnoreActors;
-	
 protected:
 	virtual void BeginPlay() override;
 	bool CheckHitEnable(AActor* OtherActor);
