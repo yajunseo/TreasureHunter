@@ -9,12 +9,14 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GroomComponent.h"
 #include "Components/AttributeComponent.h"
+#include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "HUD/TreasureHunterOverlay.h"
 #include "HUD/TreasuretHunterHUD.h"
 #include "Items/Soul.h"
 #include "Items/Treasure.h"
 #include "Items/Weapons/Weapon.h"
+#include "Trigger/TriggerBoxBase.h"
 
 ATreasureHunterCharacter::ATreasureHunterCharacter()
 {
@@ -42,6 +44,9 @@ ATreasureHunterCharacter::ATreasureHunterCharacter()
 	Eyebrows = CreateDefaultSubobject<UGroomComponent>(TEXT("Eyebrows"));
 	Eyebrows->SetupAttachment(GetMesh());
 	Eyebrows->AttachmentName = FString("head");
+
+	TriggerComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Trigger"));
+	TriggerComponent->SetupAttachment(RootComponent);
 }
 
 void ATreasureHunterCharacter::Tick(float DeltaSeconds)
@@ -74,6 +79,26 @@ void ATreasureHunterCharacter::InitializeTreasureHunterOverlay()
 				TreasureHunterOverlay->SetSoulText(Attribute->GetSouls());
 			}
 		}
+	}
+}
+
+void ATreasureHunterCharacter::TriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ATriggerBoxBase* TriggerBoxBase = Cast<ATriggerBoxBase>(OtherActor);
+	if(TriggerBoxBase)
+	{
+		TriggerBox = TriggerBoxBase;
+	}
+}
+
+void ATreasureHunterCharacter::TriggerOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	ATriggerBoxBase* TriggerBoxBase = Cast<ATriggerBoxBase>(OtherActor);
+	if(TriggerBoxBase)
+	{
+		TriggerBox = nullptr;
 	}
 }
 
@@ -161,6 +186,9 @@ void ATreasureHunterCharacter::BeginPlay()
 	GetMesh()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
 	GetMesh()->SetGenerateOverlapEvents(true);
 
+	TriggerComponent->OnComponentBeginOverlap.AddDynamic(this, &ATreasureHunterCharacter::TriggerOverlapBegin);
+	TriggerComponent->OnComponentEndOverlap.AddDynamic(this, &ATreasureHunterCharacter::ATreasureHunterCharacter::TriggerOverlapEnd);
+	
 	InitializeTreasureHunterOverlay();
 }
 
@@ -242,6 +270,15 @@ void ATreasureHunterCharacter::Dodge()
 	ActionState = EActionState::EAS_Dodge;
 	Attribute->UseStamina(DodgeStaminaCost);
 	TreasureHunterOverlay->SetStaminaBarPercent(Attribute->GetStaminaPercent());
+}
+
+void ATreasureHunterCharacter::Trigger()
+{
+	if(TriggerBox)
+	{
+		TriggerBox->TriggerAction();
+		TriggerBox = nullptr;
+	}
 }
 
 void ATreasureHunterCharacter::SpawnWeapon(AWeapon* Weapon)
@@ -349,6 +386,7 @@ void ATreasureHunterCharacter::SetupPlayerInputComponent(UInputComponent* Player
 		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Started, this, &ATreasureHunterCharacter::Equip);
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Attack);
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Dodge);
+		EnhancedInputComponent->BindAction(TriggerAction, ETriggerEvent::Triggered, this, &ATreasureHunterCharacter::Trigger);
 	}
 }
 

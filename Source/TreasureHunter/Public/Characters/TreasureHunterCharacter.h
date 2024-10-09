@@ -67,6 +67,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UInputAction* DodgeAction;
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* TriggerAction;
 	
 	// Callbacks for input
 	void Move(const FInputActionValue& Value);
@@ -74,6 +77,7 @@ protected:
 	void Equip();
 	virtual void Attack() override;
 	void Dodge();
+	void Trigger();
 
 	// Item
 	void SpawnWeapon(AWeapon* Weapon);
@@ -117,9 +121,20 @@ private:
 	class UGroomComponent* Hair;
 	UPROPERTY(VisibleAnywhere, Category = Hair)
 	class UGroomComponent* Eyebrows;
+	UPROPERTY(VisibleAnywhere, Category = Hair)
+	class UBoxComponent* TriggerComponent;
 	
 	UPROPERTY(VisibleInstanceOnly)
 	class AItem* OverlappingItem;
+
+	// Trigger
+	UFUNCTION()
+	void TriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void TriggerOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UPROPERTY()
+	class ATriggerBoxBase* TriggerBox = nullptr;
 
 	// Animation Montages
 	UPROPERTY(EditDefaultsOnly, Category = Montages)

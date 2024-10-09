@@ -13,17 +13,26 @@ void ATriggerBoxMove::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ATriggerBoxMove::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
+void ATriggerBoxMove::TriggerAction()
 {
-	Super::OnOverlapBegin(OverlappedActor, OtherActor);
+	Super::TriggerAction();
 
-	// 임시
+	SavePlayerData();
+}
+
+void ATriggerBoxMove::SavePlayerData()
+{
 	USaveInstance* SaveInstance = Cast<USaveInstance>(GetGameInstance());
 	ATreasureHunterCharacter* Player = Cast<ATreasureHunterCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 
 	SaveInstance->SaveData(Player);
 	
 	ChangeLevel(this, MoveLevelName);
+}
+
+void ATriggerBoxMove::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
+{
+	Super::OnOverlapBegin(OverlappedActor, OtherActor);
 }
 
 void ATriggerBoxMove::OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor)

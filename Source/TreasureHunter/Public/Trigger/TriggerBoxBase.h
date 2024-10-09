@@ -18,6 +18,9 @@ public:
 	ATriggerBoxBase();
 
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	virtual void TriggerAction();
 	
 protected:
 	UFUNCTION()
@@ -26,6 +29,13 @@ protected:
 	UFUNCTION()
 	virtual void OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
 	
-	UPROPERTY(EditAnywhere, Category = "Widget")
-	class UWidgetComponent* TriggerWidget;
+	UPROPERTY(EditAnywhere, Category = "Text")
+	class UTextRenderComponent* TextRender;
+
+	
+private:
+	bool IsTrigger = false;
+
+public:
+	FORCEINLINE bool GetIsTrigger() const {return IsTrigger;}
 };

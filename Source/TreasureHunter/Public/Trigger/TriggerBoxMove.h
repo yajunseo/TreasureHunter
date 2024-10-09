@@ -14,13 +14,16 @@ class TREASUREHUNTER_API ATriggerBoxMove : public ATriggerBoxBase
 {
 	GENERATED_BODY()
 
-virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
+	
+	virtual void TriggerAction() override;
 	
 protected:
 	virtual void OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor) override;
 	virtual void OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor) override;
 
 private:
+	void SavePlayerData();
     void ChangeLevel(UObject* WorldContextObject, const FName LevelName);
 	
 	UPROPERTY(EditAnywhere, Category = "Move")

@@ -4,42 +4,55 @@
 #include "Trigger/TriggerBoxBase.h"
 
 #include "Characters/TreasureHunterCharacter.h"
+#include "Components/BillboardComponent.h"
 #include "Components/ShapeComponent.h"
+#include "Components/TextRenderComponent.h"
 #include "Components/WidgetComponent.h"
 
 
 ATriggerBoxBase::ATriggerBoxBase()
 {
-	TriggerWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Widget Component"));
+	TextRender = CreateDefaultSubobject<UTextRenderComponent>(TEXT("Text Render Component"));
 
-	TriggerWidget->SetupAttachment(RootComponent);
+	TextRender->SetupAttachment(RootComponent);
 }
 
 void ATriggerBoxBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetSpriteComponent()->SetHiddenInGame(true);
+	IsTrigger = false;
+	
 	OnActorBeginOverlap.AddDynamic(this, &ATriggerBoxBase::OnOverlapBegin);
 	OnActorEndOverlap.AddDynamic(this, &ATriggerBoxBase::OnOverlapEnd);
 	
-	if(TriggerWidget && TriggerWidget->GetWidget())
+	if(TextRender)
 	{
-		TriggerWidget->SetHiddenInGame(false);
+		TextRender->SetVisibility(false);
 	}
+}
+
+void ATriggerBoxBase::TriggerAction()
+{
 }
 
 void ATriggerBoxBase::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 {
-	if(TriggerWidget && TriggerWidget->GetWidget())
+	IsTrigger = true;
+	
+	if(TextRender)
 	{
-		TriggerWidget->SetVisibility(true);
+		TextRender->SetVisibility(true);
 	}
 }
 
 void ATriggerBoxBase::OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor)
 {
-	if(TriggerWidget && TriggerWidget->GetWidget())
+	IsTrigger = false;
+	
+	if(TextRender)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("falseFalse"));
+		TextRender->SetVisibility(false);
 	}
 }
