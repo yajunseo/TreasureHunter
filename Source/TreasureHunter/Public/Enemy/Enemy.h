@@ -96,7 +96,8 @@ private:
 	void AIMoveTo(const AActor* TargetActor);
 	AActor* ChoosePatrolTarget();
 	void SpawnDefaultWeapon();
-	
+	void InitPatrolToTarget();
+
 	UFUNCTION()
 	void PawnSeen(APawn* SeenPawn);
 
@@ -131,6 +132,15 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat");
 	double AcceptanceRadius = 50.f;
+
+	// Animation Montages
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
+	class UAnimMontage* AppearMontage;
+
+	UFUNCTION(BlueprintCallable)
+	void AppearEnd();
+	
+	//
 	
 	UPROPERTY()
 	class AAIController* EnemyController;
@@ -171,4 +181,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TSubclassOf<class ASoul> SoulClass;
+
+public:
+	FOnMontageEnded AppearMontageEndedDelegate;
+	void PlayAppearMontage();
 };

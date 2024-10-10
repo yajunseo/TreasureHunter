@@ -150,6 +150,23 @@ void AEnemy::PawnSeen(APawn* SeenPawn)
 	ChaseTarget();
 }
 
+void AEnemy::PlayAppearMontage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	
+	if(AnimInstance && AppearMontage)
+	{
+		EnemyState = EEnemyState::EES_Appear;
+		AnimInstance->Montage_Play(AppearMontage);
+	}
+}
+
+void AEnemy::AppearEnd()
+{
+	EnemyState = EEnemyState::EES_Patrolling;
+	InitPatrolToTarget();
+}
+
 void AEnemy::SpawnDefaultWeapon()
 {
 	UWorld* World = GetWorld();
@@ -165,14 +182,18 @@ void AEnemy::SpawnDefaultWeapon()
 	}
 }
 
+void AEnemy::InitPatrolToTarget()
+{
+	EnemyController = Cast<AAIController>(GetController());
+	AIMoveTo(PatrolTarget);
+}
+
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
 	Tags.Add(TEXT("Enemy"));
 	
-	EnemyController = Cast<AAIController>(GetController());
-	AIMoveTo(PatrolTarget);
 	HideHealthBar();
 	SpawnDefaultWeapon();
 
@@ -180,6 +201,16 @@ void AEnemy::BeginPlay()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
+
+	if(AppearMontage)
+	{
+		PlayAppearMontage();
+	}
+
+	else
+	{
+		InitPatrolToTarget();	
+	}
 }
 
 void AEnemy::SpawnSoul()
@@ -383,7 +414,7 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 	}
 	ClearPatrolTimer();
 	ClearAttackTimer();
-	StopAttackMontage();
+	PlayAppearMontage();
 	
 	if(IsInSideAttackRadius())
 	{
