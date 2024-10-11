@@ -18,4 +18,7 @@ void AGameModeArena::BeginPlay()
 	{
 		SaveInstance->LoadData(Player);
 	}
+
+	// test
+	PlayBossAppearLevelSequence();
 }

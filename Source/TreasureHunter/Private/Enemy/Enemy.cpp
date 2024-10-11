@@ -74,6 +74,9 @@ AActor* AEnemy::ChoosePatrolTarget()
 
 void AEnemy::Attack()
 {
+	if(!CanAttack())
+		return;
+	
 	Super::Attack();
 
 	if(CombatTarget == nullptr)
@@ -414,7 +417,7 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 	}
 	ClearPatrolTimer();
 	ClearAttackTimer();
-	PlayAppearMontage();
+	StopAttackMontage();
 	
 	if(IsInSideAttackRadius())
 	{

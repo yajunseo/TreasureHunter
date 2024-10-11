@@ -15,5 +15,27 @@ class TREASUREHUNTER_API ABaseGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
+
+protected:
+	UFUNCTION()
+	virtual void PlayBossAppearLevelSequence();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void SpawnBoss();
+	
+private:
+	
+	UPROPERTY(EditAnywhere, Category = "Boss")
+	class ULevelSequence* BossAppearLevelSequence;
+
+	UPROPERTY(EditAnywhere, Category = "Boss")
+	TSubclassOf<class AEnemy> Boss;
+
+	UPROPERTY()
+	class ATargetPoint* BossSpawnPoint;
+
+	const FName BossTagName = "Boss";
+
+	void FindBossSpanwLocation();
 };
