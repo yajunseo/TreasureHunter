@@ -2,11 +2,8 @@
 
 
 #include "Trigger/TriggerBoxMove.h"
-
-#include "Characters/TreasureHunterCharacter.h"
-#include "Components/WidgetComponent.h"
+#include "GameMode/BaseGameMode.h"
 #include "Kismet/GameplayStatics.h"
-#include "Instance/SaveInstance.h"
 
 void ATriggerBoxMove::BeginPlay()
 {
@@ -22,10 +19,17 @@ void ATriggerBoxMove::TriggerAction()
 
 void ATriggerBoxMove::SavePlayerData()
 {
-	USaveInstance* SaveInstance = Cast<USaveInstance>(GetGameInstance());
-	ATreasureHunterCharacter* Player = Cast<ATreasureHunterCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	UWorld* World = GetWorld();
 
-	SaveInstance->SaveData(Player);
+	if(World)
+	{
+		ABaseGameMode* GameMode = Cast<ABaseGameMode>(UGameplayStatics::GetGameMode(World));
+
+		if(GameMode)
+		{
+			GameMode->SaveGame();
+		}
+	}
 	
 	ChangeLevel(this, MoveLevelName);
 }

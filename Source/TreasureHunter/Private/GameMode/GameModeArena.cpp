@@ -2,21 +2,22 @@
 
 
 #include "GameMode/GameModeArena.h"
-
-#include "Characters/TreasureHunterCharacter.h"
-#include "Instance/SaveInstance.h"
 #include "Kismet/GameplayStatics.h"
 
 void AGameModeArena::BeginPlay()
 {
 	Super::BeginPlay();
 
-	USaveInstance* SaveInstance = Cast<USaveInstance>(GetGameInstance());
-	ATreasureHunterCharacter* Player = Cast<ATreasureHunterCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	UWorld* World = GetWorld();
 
-	if(SaveInstance && Player)
+	if(World)
 	{
-		SaveInstance->LoadData(Player);
+		ABaseGameMode* GameMode = Cast<ABaseGameMode>(UGameplayStatics::GetGameMode(World));
+
+		if(GameMode)
+		{
+			GameMode->LoadGame();
+		}
 	}
 
 	// test

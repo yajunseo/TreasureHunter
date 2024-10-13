@@ -1,25 +1,25 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Instance/SaveInstance.h"
 
+#include "Instance/SaveManager.h"
 #include "Characters/TreasureHunterCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Save/SaveAttribute.h"
 #include "Save/SaveEquippedItem.h"
 
-void USaveInstance::SaveData(ATreasureHunterCharacter* Player)
+void USaveManager::SaveData(ATreasureHunterCharacter* Player)
 {
 	SavePlayerAttributes(Player->GetAttribute());
 	SavePlayerEquippedItem(Player->GetPlayerEquippedItem());
 }
 
-void USaveInstance::LoadData(ATreasureHunterCharacter* Player)
+void USaveManager::LoadData(ATreasureHunterCharacter* Player)
 {
 	LoadPlayerAttributes(Player->GetAttribute());
 	LoadPlayerEquippedItem(Player);
 }
 
-void USaveInstance::SavePlayerAttributes(UAttributeComponent* AttributeComponent)
+void USaveManager::SavePlayerAttributes(UAttributeComponent* AttributeComponent)
 {
 	USaveAttribute* SaveAttribute = Cast<USaveAttribute>(UGameplayStatics::CreateSaveGameObject(USaveAttribute::StaticClass()));
 
@@ -37,7 +37,7 @@ void USaveInstance::SavePlayerAttributes(UAttributeComponent* AttributeComponent
 	}
 }
 
-void USaveInstance::LoadPlayerAttributes(UAttributeComponent* AttributeComponent)
+void USaveManager::LoadPlayerAttributes(UAttributeComponent* AttributeComponent)
 {
 	USaveAttribute* LoaddedGame = Cast<USaveAttribute>(UGameplayStatics::LoadGameFromSlot(SaveSlotNameAttribute, UserIndex));
 
@@ -53,7 +53,7 @@ void USaveInstance::LoadPlayerAttributes(UAttributeComponent* AttributeComponent
 	}
 }
 
-void USaveInstance::SavePlayerEquippedItem(struct FEquippedItem& EquippedItem)
+void USaveManager::SavePlayerEquippedItem(struct FEquippedItem& EquippedItem)
 {
 	USaveEquippedItem* SaveItem = Cast<USaveEquippedItem>(UGameplayStatics::CreateSaveGameObject(USaveEquippedItem::StaticClass()));
 	SaveItem->SaveEquippedItem(EquippedItem);
@@ -70,7 +70,7 @@ void USaveInstance::SavePlayerEquippedItem(struct FEquippedItem& EquippedItem)
 	}
 }
 
-void USaveInstance::LoadPlayerEquippedItem(class ATreasureHunterCharacter* Player)
+void USaveManager::LoadPlayerEquippedItem(class ATreasureHunterCharacter* Player)
 {
 	USaveEquippedItem* LoadItem = Cast<USaveEquippedItem>(UGameplayStatics::LoadGameFromSlot(SaveSlotNameEquippedItem, UserIndex));
 

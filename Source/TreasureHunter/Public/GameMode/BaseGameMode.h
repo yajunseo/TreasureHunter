@@ -17,7 +17,25 @@ class TREASUREHUNTER_API ABaseGameMode : public AGameModeBase
 public:
 	virtual void BeginPlay() override;
 
+	// Save
+	UFUNCTION()
+	virtual void LoadGame();
+
+	UFUNCTION()
+	virtual void SaveGame();
+
+	// BGN
+	UFUNCTION()
+	virtual void PlayLevelBGM();
+
+	UFUNCTION()
+	virtual void PauseLevelBGM();
+
+	UFUNCTION()
+	virtual void StopLevelBGM();
+	
 protected:
+	// Appear
 	UFUNCTION()
 	virtual void PlayBossAppearLevelSequence();
 
@@ -25,7 +43,17 @@ protected:
 	virtual void SpawnBoss();
 	
 private:
+	UPROPERTY()
+	class UTreasureHunterGameInstance* GameInstance;
 	
+	UPROPERTY()
+	class ATreasureHunterCharacter* Player;
+
+	// BGM
+	UPROPERTY(EditAnywhere, Category = "BGM")
+	class USoundCue* LevelBGM;
+	
+	// Boss
 	UPROPERTY(EditAnywhere, Category = "Boss")
 	class ULevelSequence* BossAppearLevelSequence;
 
@@ -38,4 +66,5 @@ private:
 	const FName BossTagName = "Boss";
 
 	void FindBossSpanwLocation();
+	//
 };

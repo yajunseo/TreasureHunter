@@ -4,13 +4,68 @@
 #include "GameMode/BaseGameMode.h"
 
 #include "LevelSequencePlayer.h"
+#include "Characters/TreasureHunterCharacter.h"
 #include "Enemy/Enemy.h"
 #include "Engine/TargetPoint.h"
+#include "Instance/SaveManager.h"
+#include "Instance/SoundManager.h"
+#include "Instance/TreasureHunterGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
 void ABaseGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GameInstance = Cast<UTreasureHunterGameInstance>(UGameplayStatics::GetGameInstance(this));
+	if(GameInstance)
+	{
+		GameInstance->Init();
+	}
+	
+	Player = Cast<ATreasureHunterCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	
+	PlayLevelBGM();
+}
+
+void ABaseGameMode::LoadGame()
+{
+	if(GameInstance && Player)
+	{
+		GameInstance->GetSaveManager()->LoadData(Player);
+	}
+}
+
+void ABaseGameMode::SaveGame()
+{
+	if(GameInstance && Player)
+	{
+		GameInstance->GetSaveManager()->SaveData(Player);
+	}
+}
+
+void ABaseGameMode::PlayLevelBGM()
+{
+	if(GameInstance && LevelBGM)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("LevelBGM"));
+		GameInstance->GetSoundManager()->PlayBgm(LevelBGM);
+	}
+}
+
+void ABaseGameMode::PauseLevelBGM()
+{
+	if(GameInstance && LevelBGM)
+	{
+		GameInstance->GetSoundManager()->PauseBGM();
+	}
+}
+
+void ABaseGameMode::StopLevelBGM()
+{
+	if(GameInstance && LevelBGM)
+	{
+		GameInstance->GetSoundManager()->StopBGM();
+	}
 }
 
 void ABaseGameMode::PlayBossAppearLevelSequence()
@@ -26,6 +81,7 @@ void ABaseGameMode::PlayBossAppearLevelSequence()
 		if(BossAppearPlayer)
 		{
 			BossAppearPlayer->Play();
+			StopLevelBGM();
 		}
 	}
 }
@@ -38,6 +94,7 @@ void ABaseGameMode::SpawnBoss()
 	if(World && Boss && BossSpawnPoint)
 	{
 		World->SpawnActor<AEnemy>(Boss, BossSpawnPoint->GetActorLocation(), BossSpawnPoint->GetActorRotation());
+		PlayLevelBGM();
 	}
 }
 

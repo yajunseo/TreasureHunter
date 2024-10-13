@@ -16,21 +16,8 @@ void USaveEquippedItem::SaveEquippedItem(struct FEquippedItem& EquippedItem)
 
 void USaveEquippedItem::LoadEquippedItem(class ATreasureHunterCharacter* Player)
 {
-	UE_LOG(LogTemp, Warning, TEXT("111"));
-	int32 a = 3;
-
 	if(Player)
 	{
-		if(PlayerEquippedItem.WeaponName.IsEmpty())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("333"));
-		}
-		
 		Player->SetPlayerEquippedItem(PlayerEquippedItem);
-	}
-
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("222"));
 	}
 }
