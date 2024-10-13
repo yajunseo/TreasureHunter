@@ -33,6 +33,17 @@ public:
 
 	UFUNCTION()
 	virtual void StopLevelBGM();
+
+	// GameEnd
+	UFUNCTION()
+	void GameDefeat();
+
+	UFUNCTION()
+	void GameClear();
+
+	// Restart
+	UFUNCTION()
+	void RestartGame();
 	
 protected:
 	// Appear
@@ -48,6 +59,12 @@ private:
 	
 	UPROPERTY()
 	class ATreasureHunterCharacter* Player;
+
+	UPROPERTY()
+	class APlayerController* PlayerController;
+
+	UPROPERTY()
+	class ATreasuretHunterHUD* TreasuretHunterHUD;
 
 	// BGM
 	UPROPERTY(EditAnywhere, Category = "BGM")
@@ -66,5 +83,7 @@ private:
 	const FName BossTagName = "Boss";
 
 	void FindBossSpanwLocation();
-	//
+	
+	//Restart
+	const FName RestartLevelName = "Prison";
 };

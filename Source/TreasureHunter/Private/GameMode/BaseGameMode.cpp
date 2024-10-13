@@ -7,6 +7,7 @@
 #include "Characters/TreasureHunterCharacter.h"
 #include "Enemy/Enemy.h"
 #include "Engine/TargetPoint.h"
+#include "HUD/TreasuretHunterHUD.h"
 #include "Instance/SaveManager.h"
 #include "Instance/SoundManager.h"
 #include "Instance/TreasureHunterGameInstance.h"
@@ -23,6 +24,9 @@ void ABaseGameMode::BeginPlay()
 	}
 	
 	Player = Cast<ATreasureHunterCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+
+	PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	TreasuretHunterHUD = Cast<ATreasuretHunterHUD>(PlayerController->GetHUD());	
 	
 	PlayLevelBGM();
 }
@@ -47,7 +51,6 @@ void ABaseGameMode::PlayLevelBGM()
 {
 	if(GameInstance && LevelBGM)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("LevelBGM"));
 		GameInstance->GetSoundManager()->PlayBgm(LevelBGM);
 	}
 }
@@ -65,6 +68,30 @@ void ABaseGameMode::StopLevelBGM()
 	if(GameInstance && LevelBGM)
 	{
 		GameInstance->GetSoundManager()->StopBGM();
+	}
+}
+
+void ABaseGameMode::GameDefeat()
+{
+	if(TreasuretHunterHUD && PlayerController)
+	{
+		UGameplayStatics::SetGamePaused(this, true);
+		PlayerController->SetInputMode(FInputModeUIOnly());
+		PlayerController->bShowMouseCursor = true;
+
+		TreasuretHunterHUD->ShowDefeatWidget(Player->GetAttribute());
+	}
+}
+
+void ABaseGameMode::GameClear()
+{
+	if(TreasuretHunterHUD && PlayerController)
+	{
+		UGameplayStatics::SetGamePaused(this, true);
+		PlayerController->SetInputMode(FInputModeUIOnly());
+		PlayerController->bShowMouseCursor = true;
+		
+		TreasuretHunterHUD->ShowClearWidget(Player->GetAttribute());
 	}
 }
 
@@ -96,6 +123,15 @@ void ABaseGameMode::SpawnBoss()
 		World->SpawnActor<AEnemy>(Boss, BossSpawnPoint->GetActorLocation(), BossSpawnPoint->GetActorRotation());
 		PlayLevelBGM();
 	}
+}
+
+void ABaseGameMode::RestartGame()
+{
+	UGameplayStatics::SetGamePaused(this, false);
+	PlayerController->SetInputMode(FInputModeGameOnly());
+	PlayerController->bShowMouseCursor = false;
+	
+	UGameplayStatics::OpenLevel(this, RestartLevelName);
 }
 
 void ABaseGameMode::FindBossSpanwLocation()

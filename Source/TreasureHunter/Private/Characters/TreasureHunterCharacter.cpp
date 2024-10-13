@@ -11,11 +11,13 @@
 #include "Components/AttributeComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameMode/BaseGameMode.h"
 #include "HUD/TreasureHunterOverlay.h"
 #include "HUD/TreasuretHunterHUD.h"
 #include "Items/Soul.h"
 #include "Items/Treasure.h"
 #include "Items/Weapons/Weapon.h"
+#include "Kismet/GameplayStatics.h"
 #include "Trigger/TriggerBoxBase.h"
 
 ATreasureHunterCharacter::ATreasureHunterCharacter()
@@ -100,6 +102,12 @@ void ATreasureHunterCharacter::TriggerOverlapEnd(UPrimitiveComponent* Overlapped
 	{
 		TriggerBox = nullptr;
 	}
+}
+
+void ATreasureHunterCharacter::GameDefeat()
+{
+	ABaseGameMode* GameMode = Cast<ABaseGameMode>(UGameplayStatics::GetGameMode(this));
+	GameMode->GameDefeat();	
 }
 
 void ATreasureHunterCharacter::SetPlayerEquippedItem(FEquippedItem& EquippedItem)
@@ -315,6 +323,18 @@ void ATreasureHunterCharacter::Die_Implementation()
 
 	ActionState = EActionState::EAS_Dead;
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	UWorld* World = GetWorld();
+	if(World)
+	{
+		World->GetTimerManager().SetTimer(
+		DefeatHandle,
+		this,
+		&ATreasureHunterCharacter::GameDefeat,
+		1.0f,
+		false
+		);
+	}
 }
 
 void ATreasureHunterCharacter::AttackEnd()

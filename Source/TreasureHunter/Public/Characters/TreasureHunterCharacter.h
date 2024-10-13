@@ -145,6 +145,10 @@ private:
 
 	UPROPERTY()
 	class UTreasureHunterOverlay* TreasureHunterOverlay;
+
+	// GameEnd
+	FTimerHandle DefeatHandle;
+	void GameDefeat();
 	
 public:
 	void SetPlayerEquippedItem(FEquippedItem& EquippedItem);

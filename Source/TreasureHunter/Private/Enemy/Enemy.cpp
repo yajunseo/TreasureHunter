@@ -102,12 +102,6 @@ bool AEnemy::CanAttack()
 		&& !IsEngaged() 
 		&& !IsDead();
 
-	UE_LOG(LogTemp, Warning, TEXT("IsInSideAttackRadius : %s"), IsInSideAttackRadius() ? TEXT("true") : TEXT("false"));
-	UE_LOG(LogTemp, Warning, TEXT("IsAttacking : %s"), IsAttacking() ? TEXT("true") : TEXT("false"));
-	UE_LOG(LogTemp, Warning, TEXT("IsEngaged : %s"), IsEngaged() ? TEXT("true") : TEXT("false"));
-	UE_LOG(LogTemp, Warning, TEXT("IsDead : %s"), IsDead() ? TEXT("true") : TEXT("false"));
-	UE_LOG(LogTemp, Warning, TEXT("CanAttack : %s"), bCanAttack ? TEXT("true") : TEXT("false"));
-	UE_LOG(LogTemp, Warning, TEXT("----------------------"));
 	return bCanAttack;
 }
 
