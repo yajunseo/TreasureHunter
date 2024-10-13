@@ -12,8 +12,10 @@
 #include "Perception/PawnSensingComponent.h"
 #include "Components/AttributeComponent.h"
 #include "Components/BoxComponent.h"
+#include "GameMode/BaseGameMode.h"
 #include "Items/Soul.h"
 #include "Items/Weapons/Weapon.h"
+#include "Kismet/GameplayStatics.h"
 
 AEnemy::AEnemy()
 {
@@ -243,6 +245,12 @@ void AEnemy::Die_Implementation()
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 	SpawnSoul();
+
+	ABaseGameMode* GameMode = Cast<ABaseGameMode>(UGameplayStatics::GetGameMode(this));
+	if(GameMode)
+	{
+		GameMode->CheckClearGame();
+	}
 }
 
 bool AEnemy::InTargetRange(AActor* Target, double Radius)

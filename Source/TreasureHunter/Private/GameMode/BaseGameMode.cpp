@@ -95,9 +95,14 @@ void ABaseGameMode::GameClear()
 	}
 }
 
+void ABaseGameMode::CheckClearGame()
+{
+
+}
+
 void ABaseGameMode::PlayBossAppearLevelSequence()
 {
-	if(BossAppearLevelSequence && Boss)
+	if(BossAppearLevelSequence && BossClass)
 	{
 		UWorld* World = GetWorld();
 		FMovieSceneSequencePlaybackSettings PlaybackSettings;
@@ -118,9 +123,9 @@ void ABaseGameMode::SpawnBoss()
 	UWorld* World = GetWorld();
 	FindBossSpanwLocation();
 	
-	if(World && Boss && BossSpawnPoint)
+	if(World && BossClass && BossSpawnPoint)
 	{
-		World->SpawnActor<AEnemy>(Boss, BossSpawnPoint->GetActorLocation(), BossSpawnPoint->GetActorRotation());
+		Boss = World->SpawnActor<AEnemy>(BossClass, BossSpawnPoint->GetActorLocation(), BossSpawnPoint->GetActorRotation());
 		PlayLevelBGM();
 	}
 }

@@ -85,7 +85,6 @@ private:
 	bool IsInSideAttackRadius();
 	bool IsChasing();
 	bool IsAttacking();
-	bool IsDead();
 	bool IsEngaged();
 	void StartPatrolling();
 	void ChaseTarget();
@@ -185,4 +184,5 @@ private:
 public:
 	FOnMontageEnded AppearMontageEndedDelegate;
 	void PlayAppearMontage();
+	bool IsDead();
 };

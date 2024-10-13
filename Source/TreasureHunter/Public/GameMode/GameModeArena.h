@@ -16,4 +16,8 @@ class TREASUREHUNTER_API AGameModeArena : public ABaseGameMode
 
 public:
 	virtual void BeginPlay() override;
+	virtual void CheckClearGame() override;
+
+private:
+	FTimerHandle ClearTimeHandle;
 };

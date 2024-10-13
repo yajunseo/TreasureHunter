@@ -41,6 +41,9 @@ public:
 	UFUNCTION()
 	void GameClear();
 
+	UFUNCTION()
+	virtual void CheckClearGame();
+	
 	// Restart
 	UFUNCTION()
 	void RestartGame();
@@ -52,6 +55,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void SpawnBoss();
+
+	UPROPERTY()
+	class AEnemy* Boss;
 	
 private:
 	UPROPERTY()
@@ -75,8 +81,8 @@ private:
 	class ULevelSequence* BossAppearLevelSequence;
 
 	UPROPERTY(EditAnywhere, Category = "Boss")
-	TSubclassOf<class AEnemy> Boss;
-
+	TSubclassOf<class AEnemy> BossClass;
+	
 	UPROPERTY()
 	class ATargetPoint* BossSpawnPoint;
 
