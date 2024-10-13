@@ -26,7 +26,7 @@ void UGameEndBase::SetScoreText(int32 Score)
 {
 	FString ScoreString = FString::Printf(TEXT("%d"), Score);
 	FText  ScoreTxt = FText::FromString(ScoreString);
-	SoulText->SetText(ScoreTxt);
+	ScoreText->SetText(ScoreTxt);
 }
 
 void UGameEndBase::NativeConstruct()
@@ -42,6 +42,12 @@ void UGameEndBase::NativeConstruct()
 void UGameEndBase::SetEndUI(int32 Gold, int32 Soul)
 {
 	int32 Score = Gold * Soul;
+
+	if(Gold == 0 || Soul == 0)
+	{
+		Score = Gold + Soul;
+	}
+	
 	SetGoldText(Gold);
 	SetSoulText(Soul);
 	SetScoreText(Score);
