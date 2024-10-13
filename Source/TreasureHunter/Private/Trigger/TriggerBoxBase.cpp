@@ -21,7 +21,10 @@ void ATriggerBoxBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetSpriteComponent()->SetHiddenInGame(true);
+// #if  WITH_EDITORONLY_DATA
+// 	GetSpriteComponent()->SetHiddenInGame(true);
+// #endif
+	
 	IsTrigger = false;
 	
 	OnActorBeginOverlap.AddDynamic(this, &ATriggerBoxBase::OnOverlapBegin);
