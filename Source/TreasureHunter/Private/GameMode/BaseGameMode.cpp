@@ -16,7 +16,7 @@
 void ABaseGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	GameInstance = Cast<UTreasureHunterGameInstance>(UGameplayStatics::GetGameInstance(this));
 	if(GameInstance)
 	{

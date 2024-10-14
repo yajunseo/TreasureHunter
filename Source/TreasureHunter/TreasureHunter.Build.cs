@@ -11,7 +11,8 @@ public class TreasureHunter : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
 			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Niagara", "HairStrandsCore",
-			"GeometryCollectionEngine", "Niagara", "UMG", "AIModule", "LevelSequence", "MovieScene", "MovieSceneTracks"
+			"GeometryCollectionEngine", "Niagara", "UMG", "AIModule", "LevelSequence", "MovieScene", "MovieSceneTracks",
+			"EngineSettings"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
